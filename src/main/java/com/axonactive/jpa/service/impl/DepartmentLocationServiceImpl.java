@@ -39,9 +39,7 @@ public class DepartmentLocationServiceImpl implements DepartmentLocationService 
         TypedQuery<DepartmentLocation> namedQuery = em.createNamedQuery(DepartmentLocation.GET_ALL, DepartmentLocation.class);
         namedQuery.setParameter("departmentId", departmentId);
         List<DepartmentLocation> departmentLocationList = namedQuery.getResultList();
-        List<DepartmentLocationDTO> departmentLocationDTOList = DepartmentLocationMapper.INSTANCE.DepartmentLocationsToDepartmentLocationDtos(departmentLocationList);
-
-        return departmentLocationDTOList;
+        return DepartmentLocationMapper.INSTANCE.DepartmentLocationsToDepartmentLocationDtos(departmentLocationList);
     }
 
     @Override

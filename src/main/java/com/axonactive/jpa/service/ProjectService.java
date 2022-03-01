@@ -7,6 +7,9 @@ import com.axonactive.jpa.service.dto.ProjectDTO;
 import java.util.List;
 
 public interface ProjectService {
+
+    Project getProjectByIdHepler(int projectId);
+
     ProjectDTO getProjectById(int departmentId, int projectId);
 
 

@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 
 @Path("/assignments")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class AssignmentController {
 
     @Inject
@@ -30,7 +31,6 @@ public class AssignmentController {
 
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
     public Response addAssignment(AssignmentRequest assignmentRequest){
         return Response.ok(assignmentService.addAssignment(assignmentRequest)).build();
 

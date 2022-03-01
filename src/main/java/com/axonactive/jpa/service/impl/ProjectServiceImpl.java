@@ -27,7 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Inject
     private DepartmentService departmentService;
 
-    private Project getProjectByIdHelper (int departmentId, int projectId){
+    private Project getProjectByIdDepartmentIdAndProjectIdHelper(int departmentId, int projectId){
         TypedQuery<Project> namedQuery = em.createNamedQuery(Project.GET_PROJECT_BY_ID, Project.class);
         namedQuery.setParameter("departmentId",departmentId);
         namedQuery.setParameter("projectId",projectId);
@@ -35,10 +35,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     }
 
+    @Override
+    public Project getProjectByIdHepler(int projectId){
+        return em.createQuery("from Project p where p.id ="+projectId,Project.class).getSingleResult();
+    }
+
 
     @Override
     public ProjectDTO getProjectById(int departmentId, int projectId) {
-        return ProjectMapper.INSTANCE.ProjectToProjectDto(getProjectByIdHelper(departmentId,projectId));
+        return ProjectMapper.INSTANCE.ProjectToProjectDto(getProjectByIdDepartmentIdAndProjectIdHelper(departmentId,projectId));
     }
 
     @Override
@@ -62,7 +67,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void deleteProject(int departmentId, int projectId) {
-        Project project = getProjectByIdHelper(departmentId, projectId);
+        Project project = getProjectByIdDepartmentIdAndProjectIdHelper(departmentId, projectId);
         if(Objects.nonNull(project)){
             em.remove(project);
         }
@@ -71,7 +76,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectDTO updateProject(int departmentId, int projectId, ProjectRequest projectRequest) {
-        Project project = getProjectByIdHelper(departmentId, projectId);
+        Project project = getProjectByIdDepartmentIdAndProjectIdHelper(departmentId, projectId);
         project.setArea(projectRequest.getArea());
         project.setName(projectRequest.getName());
         em.merge(project);

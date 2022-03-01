@@ -1,6 +1,5 @@
 package com.axonactive.jpa.service.impl;
 
-import com.axonactive.jpa.constant.Constant;
 import com.axonactive.jpa.controller.request.RelativeRequest;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.entities.Relative;

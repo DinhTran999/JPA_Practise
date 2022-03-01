@@ -58,6 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         return namedQuery.getSingleResult();
     }
 
+    @Override
     public Employee getEmployeeById(int employeeId){
         TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_ID, Employee.class);
         namedQuery.setParameter("employeeId",employeeId);
