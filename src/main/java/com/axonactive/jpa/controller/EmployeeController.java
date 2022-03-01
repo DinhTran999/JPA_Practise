@@ -2,9 +2,7 @@ package com.axonactive.jpa.controller;
 
 
 import com.axonactive.jpa.controller.request.EmployeeRequest;
-import com.axonactive.jpa.controller.request.ProjectRequest;
 import com.axonactive.jpa.service.EmployeeService;
-import com.axonactive.jpa.service.ProjectService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -26,7 +24,7 @@ public class EmployeeController {
     @GET
     @Path("/{EmployeeId}")
     public Response getEmployeeById(@PathParam("departmentId") int departmentId, @PathParam("EmployeeId") int EmployeeId){
-        return Response.ok(employeeService.getEmployeeById(departmentId,EmployeeId)).build();
+        return Response.ok(employeeService.getEmployeeByDeptIdAndEmployeeId(departmentId,EmployeeId)).build();
     }
 
 

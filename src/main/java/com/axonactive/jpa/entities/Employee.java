@@ -1,7 +1,6 @@
 package com.axonactive.jpa.entities;
 
 import com.axonactive.jpa.enumerate.Gender;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -9,7 +8,6 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.List;
 
 @Getter
 @Setter
@@ -18,11 +16,13 @@ import java.util.List;
 @Table(name = "employee")
 @NamedQueries({
         @NamedQuery(name = Employee.GET_ALL, query = "from Employee e where e.department.id = :departmentId"),
-        @NamedQuery(name = Employee.GET_EMPLOYEE_BY_ID, query = "from Employee e where e.department.id = :departmentId and e.id = :employeeId")
+        @NamedQuery(name = Employee.GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID, query = "from Employee e where e.department.id = :departmentId and e.id = :employeeId"),
+        @NamedQuery(name = Employee.GET_EMPLOYEE_BY_ID,query = "from Employee e where e.id = :employeeId")
 })
 public class Employee {
     private static final String QUALIFIER = "com.axonactive.jpa.entities";
     public static final String GET_ALL = QUALIFIER + "getAllByDepartment";
+    public static final String GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID = QUALIFIER + "getEmployeeByDeptIdAndEmployeeId";
     public static final String GET_EMPLOYEE_BY_ID = QUALIFIER + "getEmployeeById";
 
     @Id

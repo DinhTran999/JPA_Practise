@@ -10,7 +10,7 @@ import java.util.List;
 public interface EmployeeService {
     List<EmployeeDTO> getAllEmployeeByDepartment(int departmentId);
 
-    EmployeeDTO getEmployeeById(int departmentId, int employeeId);
+    EmployeeDTO getEmployeeByDeptIdAndEmployeeId(int departmentId, int employeeId);
 
     EmployeeDTO addEmployee(int departmentId, EmployeeRequest employeeRequest);
 
@@ -22,5 +22,6 @@ public interface EmployeeService {
 
     List<EmployeeDTO> getEmployeeByBirthMonth(int month);
 
-    List<RelativeDTO> getAllRelativesByEmployee(int employeeID);
+
+
 }

@@ -8,9 +8,7 @@ import com.axonactive.jpa.service.DepartmentService;
 import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
 import com.axonactive.jpa.service.dto.EmployeeGroupByDepartmentDTO;
-import com.axonactive.jpa.service.dto.RelativeDTO;
 import com.axonactive.jpa.service.mapper.EmployeeMapper;
-import com.axonactive.jpa.service.mapper.RelativeMapper;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -35,8 +33,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Inject
     EmployeeMapper employeeMapper;
 
-    @Inject
-    RelativeMapper relativeMapper;
+
 
     @Inject
     DepartmentService departmentService;
@@ -50,28 +47,35 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDTO getEmployeeById(int departmentId, int employeeId) {
-        return employeeMapper.EmployeeToEmployeeDto(getEmployeeByIdHelper(departmentId, employeeId));
+    public EmployeeDTO getEmployeeByDeptIdAndEmployeeId(int departmentId, int employeeId) {
+        return employeeMapper.EmployeeToEmployeeDto(getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId));
     }
 
-    public Employee getEmployeeByIdHelper(int departmentId, int employeeId) {
-        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_ID, Employee.class);
+    private Employee getEmployeeByDeptIdAndEmployeeIdHelper(int departmentId, int employeeId) {
+        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID, Employee.class);
         namedQuery.setParameter("departmentId", departmentId);
         namedQuery.setParameter("employeeId", employeeId);
         return namedQuery.getSingleResult();
+    }
+
+    public Employee getEmployeeById(int employeeId){
+        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_ID, Employee.class);
+        namedQuery.setParameter("employeeId",employeeId);
+        return namedQuery.getSingleResult();
+
     }
 
     @Override
     public EmployeeDTO addEmployee(int departmentId, EmployeeRequest employeeRequest) {
         Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
         employee.setDepartment(departmentService.getDepartmentById(departmentId));
-        em.merge(employee);
+        em.persist(employee);
         return employeeMapper.EmployeeToEmployeeDto(employee);
     }
 
     @Override
     public void deleteEmployee(int departmentId, int employeeId) {
-        Employee employee = getEmployeeByIdHelper(departmentId, employeeId);
+        Employee employee = getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId);
         if (Objects.nonNull(employee)) {
             em.remove(employee);
         }
@@ -79,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO updateEmployee(int departmentId, int employeeId, EmployeeRequest employeeRequest) {
-        Employee employee = getEmployeeByIdHelper(departmentId, employeeId);
+        Employee employee = getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId);
         Employee newEmployee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
         newEmployee.setId(employee.getId());
         newEmployee.setDepartment(employee.getDepartment());
@@ -92,17 +96,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         List<EmployeeGroupByDepartmentDTO> employeeGroupByDepartmentDTOList = new ArrayList<>();
         List<Employee> employeeList = getEmployeeList();
         Map<Department, List<Employee>> employeeGroupByDepartment = employeeList.stream().collect(Collectors.groupingBy(Employee::getDepartment));
-        employeeGroupByDepartment.forEach((d,e)->{
-            employeeGroupByDepartmentDTOList.add(
-                    EmployeeGroupByDepartmentDTO.builder()
-                    .departmentName(d.getName())
-                    .startDate(d.getStartDate())
-                    .numOfEmployee(e.size())
-                    .numOfFemale(e.stream().filter(employee->employee.getGender()== Gender.FEMALE).count())
-                    .numOfMale(e.stream().filter(employee->employee.getGender()== Gender.MALE).count())
-                    .numOfU21(e.stream().filter(employee -> employee.getDateOfBirth().isAfter(LocalDate.now().minusYears(YEARS_TO_SUBTRACT))).count())
-                    .build());
-        });
+        employeeGroupByDepartment.forEach((d,e)-> employeeGroupByDepartmentDTOList.add(
+                EmployeeGroupByDepartmentDTO.builder()
+                .departmentName(d.getName())
+                .startDate(d.getStartDate())
+                .numOfEmployee(e.size())
+                .numOfFemale(e.stream().filter(employee->employee.getGender()== Gender.FEMALE).count())
+                .numOfMale(e.stream().filter(employee->employee.getGender()== Gender.MALE).count())
+                .numOfU21(e.stream().filter(employee -> employee.getDateOfBirth().isAfter(LocalDate.now().minusYears(YEARS_TO_SUBTRACT))).count())
+                .build()));
         return employeeGroupByDepartmentDTOList;
     }
 
@@ -116,8 +118,5 @@ public class EmployeeServiceImpl implements EmployeeService {
                 .filter(employee -> employee.getDateOfBirth().getMonthValue()==month).collect(Collectors.toList()));
     }
 
-    @Override
-    public List<RelativeDTO> getAllRelativesByEmployee(int employeeId) {
-        return relativeMapper.RelativesToRelativeDtos();
-    }
+
 }

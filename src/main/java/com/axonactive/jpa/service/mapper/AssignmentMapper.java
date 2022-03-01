@@ -25,5 +25,4 @@ public interface AssignmentMapper {
         assignmentDTO.setEmployeeFullName(employee.getFirstName() + " " + employee.getMiddleName() + " " + employee.getLastName());
     }
 
-    Assignment AssignmentRequestToAssignment(AssignmentRequest assignmentRequest);
 }

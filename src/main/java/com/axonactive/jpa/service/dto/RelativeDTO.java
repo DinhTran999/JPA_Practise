@@ -2,13 +2,13 @@ package com.axonactive.jpa.service.dto;
 
 import com.axonactive.jpa.enumerate.Gender;
 import com.axonactive.jpa.enumerate.Relationship;
-import lombok.Builder;
+import lombok.Builder;//dùng builder sẽ làm Mapstruct chuyển sang private không dùng được
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
+
 @Setter
-@Builder
+@Getter
 public class RelativeDTO {
     private String fullName;
     private Gender gender;
