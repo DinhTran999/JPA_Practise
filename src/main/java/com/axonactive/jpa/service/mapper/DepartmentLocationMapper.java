@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface DepartmentLocationMapper {
-    DepartmentLocationMapper INSTANCE = Mappers.getMapper( DepartmentLocationMapper.class );
+    DepartmentLocationMapper INSTANCE = Mappers.getMapper(DepartmentLocationMapper.class );
 
     DepartmentLocationDTO DepartmentLocationToDepartmentLocationDto(DepartmentLocation departmentLocation);
     List<DepartmentLocationDTO> DepartmentLocationsToDepartmentLocationDtos (List<DepartmentLocation> departmentLocations);

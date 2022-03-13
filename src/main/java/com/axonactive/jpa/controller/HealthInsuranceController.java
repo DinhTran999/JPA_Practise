@@ -25,7 +25,7 @@ public class HealthInsuranceController {
 
 
     @GET
-    @Path("{healthInsuranceId}")
+    @Path("/{healthInsuranceId}")
     public Response getHealthInsuranceByEmployeeIdAndHealthInsuranceId(@PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
         return Response.ok(healthInsuranceService.getHealthInsuranceByEmployeeIdAndHealthInsuranceId(employeeId,healthInsuranceId)).build();
     }
@@ -36,7 +36,7 @@ public class HealthInsuranceController {
     }
 
     @DELETE
-    @Path("{healthInsuranceId}")
+    @Path("/{healthInsuranceId}")
     public Response deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(@PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
         healthInsuranceService.deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(employeeId, healthInsuranceId);
         return Response.ok().build();
@@ -44,7 +44,7 @@ public class HealthInsuranceController {
 
 
     @PUT
-    @Path("{healthInsuranceId}")
+    @Path("/{healthInsuranceId}")
     public Response updateHealthInsurance(@PathParam("employeeId") int employeeId,@PathParam("healthInsuranceId") int healthInsuranceId, HealthInsuranceDTO healthInsuranceDTO){
         return Response.ok(healthInsuranceService.updateHealthInsurance(employeeId,healthInsuranceId, healthInsuranceDTO)).build();
     }

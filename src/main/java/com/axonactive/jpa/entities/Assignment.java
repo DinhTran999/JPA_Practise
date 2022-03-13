@@ -9,10 +9,8 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "assignment")
-@NamedQueries({
-        @NamedQuery(name = Assignment.GET_ALL, query = "from Assignment a where a.project.id = :projectId and a.employee.id = :employeeId"),
-        @NamedQuery(name = Assignment.GET_ASSIGNMENT_BY_ID, query = "from Assignment a where a.id = :assignmentId")
-})
+@NamedQuery(name = Assignment.GET_ALL, query = "from Assignment a where a.project.id = :projectId and a.employee.id = :employeeId")
+@NamedQuery(name = Assignment.GET_ASSIGNMENT_BY_ID, query = "from Assignment a where a.id = :assignmentId")
 public class Assignment {
 
     private static final String QUALIFIER = "com.axonactive.jpa.entities";

@@ -11,7 +11,7 @@ import java.util.List;
 public interface ProjectMapper {
     ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class );
 
-    ProjectDTO ProjectToProjectDto(Project Project);
-    List<ProjectDTO> ProjectsToProjectDtos (List<Project> Projects);
+    ProjectDTO ProjectToProjectDto(Project project);
+    List<ProjectDTO> ProjectsToProjectDtos (List<Project> projectList);
 
 }

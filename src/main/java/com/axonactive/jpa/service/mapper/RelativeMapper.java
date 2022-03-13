@@ -4,7 +4,6 @@ import com.axonactive.jpa.controller.request.RelativeRequest;
 import com.axonactive.jpa.entities.Relative;
 import com.axonactive.jpa.service.dto.RelativeDTO;
 import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -13,9 +12,9 @@ public interface RelativeMapper {
 
     RelativeDTO RelativeToRelativeDto(Relative relative);
 
-    List<RelativeDTO> RelativesToRelativeDtos(List<Relative> RelativeList);
+    List<RelativeDTO> RelativesToRelativeDtos(List<Relative> relativeList);
 
-    Relative RelativeRequestToRelative(RelativeRequest RelativeRequest);
+    Relative RelativeRequestToRelative(RelativeRequest relativeRequest);
 
 
 }

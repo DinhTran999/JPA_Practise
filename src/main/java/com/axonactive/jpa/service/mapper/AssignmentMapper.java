@@ -1,6 +1,5 @@
 package com.axonactive.jpa.service.mapper;
 
-import com.axonactive.jpa.controller.request.AssignmentRequest;
 import com.axonactive.jpa.entities.Assignment;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.service.dto.AssignmentDTO;
@@ -15,7 +14,7 @@ import java.util.List;
 public interface AssignmentMapper {
 
     @Mapping(source = "project.name", target = "projectName")
-    AssignmentDTO AssignmentToAssignmentDto(Assignment Assignment);
+    AssignmentDTO AssignmentToAssignmentDto(Assignment assignment);
 
     List<AssignmentDTO> AssignmentsToAssignmentDtos(List<Assignment> assignmentList);
 

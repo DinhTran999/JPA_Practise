@@ -52,7 +52,7 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
     @Override
     public HealthInsuranceDTO addHealthInsurance(int employeeId, HealthInsuranceDTO healthInsuranceDTO) {
         HealthInsurance healthInsurance = healthInsuranceMapper.HealthInsuranceDTOToHealthInsurance(healthInsuranceDTO);
-        healthInsurance.setEmployee(employeeService.getEmployeeById(employeeId));
+        healthInsurance.setEmployee(employeeService.getEmployeeByIdFromDataBase(employeeId));
         em.persist(healthInsurance);
         return healthInsuranceMapper.HealthInsuranceToHealthInsuranceDTO(healthInsurance);
     }

@@ -1,6 +1,5 @@
 package com.axonactive.jpa.controller;
 
-
 import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.service.EmployeeService;
 
@@ -9,43 +8,41 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/departments/{departmentId}/employees")
+@Path("employees")
 @Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeController {
-
     @Inject
-    private EmployeeService employeeService;
+    EmployeeService employeeService;
 
     @GET
-    public Response getAllEmployeeByDepartment(@PathParam("departmentId") int departmentId){
-        return Response.ok(employeeService.getAllEmployeeByDepartment(departmentId)).build();
+    public Response getAllEmployees(){
+        return Response.ok(employeeService.getAllEmployees()).build();
     }
 
     @GET
-    @Path("/{EmployeeId}")
-    public Response getEmployeeById(@PathParam("departmentId") int departmentId, @PathParam("EmployeeId") int EmployeeId){
-        return Response.ok(employeeService.getEmployeeByDeptIdAndEmployeeId(departmentId,EmployeeId)).build();
+    @Path("/{employeeId}")
+    public Response getEmployeeById(@PathParam("employeeId") int employeeId){
+        return  Response.ok(employeeService.getEmployeeById(employeeId)).build();
     }
 
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response addEmployee(@PathParam("departmentId") int departmentId, EmployeeRequest EmployeeRequest){
-        return Response.ok(employeeService.addEmployee(departmentId, EmployeeRequest)).build();
-
+    public Response addEmployee(EmployeeRequest employeeRequest){
+        return Response.ok(employeeService.addEmployee(employeeRequest)).build();
     }
 
     @DELETE
-    @Path("/{EmployeeId}")
-    public Response deleteEmployee(@PathParam("departmentId") int departmentId, @PathParam("EmployeeId") int EmployeeId){
-        employeeService.deleteEmployee(departmentId,EmployeeId);
+    @Path("/{employeeId}")
+    public Response deleteEmployeeById(@PathParam("employeeId") int employeeId){
+        employeeService.deleteEmployeeById(employeeId);
         return Response.ok().build();
+
     }
 
     @PUT
-    @Path("/{EmployeeId}")
-    public Response updateEmployee(@PathParam("departmentId") int departmentId,@PathParam("EmployeeId") int EmployeeId, EmployeeRequest EmployeeRequest){
-        return Response.ok(employeeService.updateEmployee(departmentId,EmployeeId,EmployeeRequest)).build();
+    @Path("/{employeeId}")
+    public Response updateEmployeeById(@PathParam("employeeId") int employeeId, EmployeeRequest employeeRequest){
+        return Response.ok(employeeService.updateEmployeeById(employeeId,employeeRequest)).build();
     }
-
 }

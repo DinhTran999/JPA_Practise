@@ -13,11 +13,13 @@ import java.time.LocalDate;
 @Getter
 public class EmployeeDTO {
     @NotNull
+    private Integer id;
+    @NotNull
     private String fullName;
     @Past
     @JsonbDateFormat("yyyy-MM-dd")
     private LocalDate dateOfBirth;
     private Gender gender;
     private double salary;
-    private String departmentName;
+    private int departmentId;
 }

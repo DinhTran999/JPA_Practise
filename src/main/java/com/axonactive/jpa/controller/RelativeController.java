@@ -3,7 +3,6 @@ package com.axonactive.jpa.controller;
 import com.axonactive.jpa.controller.request.RelativeRequest;
 import com.axonactive.jpa.service.RelativeService;
 
-import javax.faces.push.Push;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

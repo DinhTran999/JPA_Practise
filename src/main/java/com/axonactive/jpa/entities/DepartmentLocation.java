@@ -1,7 +1,6 @@
 package com.axonactive.jpa.entities;
 
 import com.axonactive.jpa.enumerate.Location;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,15 +10,9 @@ import javax.persistence.*;
 @Setter
 @Entity
 @Table(name = "department_location")
-
-@NamedQueries({
-        @NamedQuery(name = DepartmentLocation.GET_ALL,query = "from DepartmentLocation dl where dl.department.id = :departmentId"),
-        @NamedQuery(name = DepartmentLocation.GET_LOCATION_BY_ID,
-                query = "from DepartmentLocation dl where dl.department.id = :departmentId and dl.id = :locationId"),
-
-}
-)
-
+@NamedQuery(name = DepartmentLocation.GET_ALL, query = "from DepartmentLocation dl where dl.department.id = :departmentId")
+@NamedQuery(name = DepartmentLocation.GET_LOCATION_BY_ID,
+        query = "from DepartmentLocation dl where dl.department.id = :departmentId and dl.id = :locationId")
 public class DepartmentLocation {
 
     private static final String QUALIFIER = "com.axonactive.jpa.entities";
@@ -27,9 +20,8 @@ public class DepartmentLocation {
     public static final String GET_LOCATION_BY_ID = QUALIFIER + "getLocationById";
 
 
-
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne

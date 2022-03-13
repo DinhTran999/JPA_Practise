@@ -1,5 +1,6 @@
 package com.axonactive.jpa.service.impl;
 
+import com.axonactive.jpa.controller.request.EmployeeOfDepartmentRequest;
 import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.entities.Employee;
@@ -16,12 +17,16 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @RequestScoped
 @Transactional
@@ -33,14 +38,12 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Inject
     EmployeeMapper employeeMapper;
 
-
-
     @Inject
     DepartmentService departmentService;
 
     @Override
     public List<EmployeeDTO> getAllEmployeeByDepartment(int departmentId) {
-        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_ALL, Employee.class);
+        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_ALL_BY_DEPT_ID_AND_EMPLOYEE_ID, Employee.class);
         namedQuery.setParameter("departmentId", departmentId);
         List<Employee> employeeList = namedQuery.getResultList();
         return employeeMapper.EmployeesToEmployeeDtos(employeeList);
@@ -48,26 +51,20 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDTO getEmployeeByDeptIdAndEmployeeId(int departmentId, int employeeId) {
-        return employeeMapper.EmployeeToEmployeeDto(getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId));
+        return employeeMapper.EmployeeToEmployeeDto(getEmployeeByDeptIdAndEmployeeIdFromDataBase(departmentId, employeeId));
     }
 
-    private Employee getEmployeeByDeptIdAndEmployeeIdHelper(int departmentId, int employeeId) {
+    private Employee getEmployeeByDeptIdAndEmployeeIdFromDataBase(int departmentId, int employeeId) {
         TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID, Employee.class);
         namedQuery.setParameter("departmentId", departmentId);
         namedQuery.setParameter("employeeId", employeeId);
         return namedQuery.getSingleResult();
     }
 
-    @Override
-    public Employee getEmployeeById(int employeeId){
-        TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_ID, Employee.class);
-        namedQuery.setParameter("employeeId",employeeId);
-        return namedQuery.getSingleResult();
 
-    }
 
     @Override
-    public EmployeeDTO addEmployee(int departmentId, EmployeeRequest employeeRequest) {
+    public EmployeeDTO addEmployeeByDepartmentId(int departmentId, EmployeeOfDepartmentRequest employeeRequest) {
         Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
         employee.setDepartment(departmentService.getDepartmentById(departmentId));
         em.persist(employee);
@@ -75,16 +72,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public void deleteEmployee(int departmentId, int employeeId) {
-        Employee employee = getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId);
+    public void deleteEmployeeByDepartmentIdAndEmployeeId(int departmentId, int employeeId) {
+        Employee employee = getEmployeeByDeptIdAndEmployeeIdFromDataBase(departmentId, employeeId);
         if (Objects.nonNull(employee)) {
             em.remove(employee);
         }
     }
 
     @Override
-    public EmployeeDTO updateEmployee(int departmentId, int employeeId, EmployeeRequest employeeRequest) {
-        Employee employee = getEmployeeByDeptIdAndEmployeeIdHelper(departmentId, employeeId);
+    public EmployeeDTO updateEmployeeByDepartmentIdAndEmployeeId(int departmentId, int employeeId, EmployeeOfDepartmentRequest employeeRequest) {
+        Employee employee = getEmployeeByDeptIdAndEmployeeIdFromDataBase(departmentId, employeeId);
         Employee newEmployee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
         newEmployee.setId(employee.getId());
         newEmployee.setDepartment(employee.getDepartment());
@@ -109,14 +106,61 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeGroupByDepartmentDTOList;
     }
 
-    private List<Employee> getEmployeeList() {
-        return em.createQuery("from Employee", Employee.class).getResultList();
-    }
-
     @Override
     public List<EmployeeDTO> getEmployeeByBirthMonth(int month) {
         return employeeMapper.EmployeesToEmployeeDtos(getEmployeeList().stream()
                 .filter(employee -> employee.getDateOfBirth().getMonthValue()==month).collect(Collectors.toList()));
+    }
+
+
+    private List<Employee> getEmployeeList() {
+        return em.createNamedQuery(Employee.GET_ALL, Employee.class).getResultList();
+    }
+
+    @Override
+    public EmployeeDTO getEmployeeById(int employeeId){
+        return employeeMapper.EmployeeToEmployeeDto(getEmployeeByIdFromDataBase(employeeId));
+
+    }
+
+    @Override
+    public Employee getEmployeeByIdFromDataBase(int employeeId){
+        return em.find(Employee.class,employeeId);
+    }
+
+    @Override
+    public List<EmployeeDTO> getAllEmployees() {
+        return employeeMapper.EmployeesToEmployeeDtos(getEmployeeList());
+    }
+
+    @Override
+    public EmployeeDTO addEmployee(EmployeeRequest employeeRequest) {
+        Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
+        employee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+        em.persist(employee);
+        return employeeMapper.EmployeeToEmployeeDto(employee);
+    }
+
+    @Override
+    public void deleteEmployeeById(int employeeId) {
+        Employee employee = getEmployeeByIdFromDataBase(employeeId);
+        if(Objects.nonNull(employee)) em.remove(employee);
+    }
+
+    @Override
+    public EmployeeDTO updateEmployeeById(int employeeId, EmployeeRequest employeeRequest) {
+        Employee employee = getEmployeeByIdFromDataBase(employeeId);
+        if(Objects.nonNull(employee)){
+            employee.setFirstName(employeeRequest.getFirstName());
+            employee.setMiddleName(employeeRequest.getMiddleName());
+            employee.setLastName(employeeRequest.getLastName());
+            employee.setDateOfBirth(employeeRequest.getDateOfBirth());
+            employee.setGender(employeeRequest.getGender());
+            employee.setSalary(employeeRequest.getSalary());
+            employee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+            return employeeMapper.EmployeeToEmployeeDto(em.merge(employee));
+        }
+        throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không có Employee với Id: "+employeeId).build());
     }
 
 

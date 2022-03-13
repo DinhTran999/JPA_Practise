@@ -11,10 +11,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Table(name = "health_insurance")
-@NamedQueries({
-        @NamedQuery(name = HealthInsurance.GET_ALL_HEALTH_INSURANCE_BY_EMPLOYEE_ID,query = "from HealthInsurance h where h.employee.id =:employeeId"),
-        @NamedQuery(name = HealthInsurance.GET_HEALTH_INSURANCE_BY_EMPLOYEE_ID_AND_HEALTH_INSURANCE_ID,query = "from HealthInsurance h where h.employee.id=:employeeId and h.id=:healthInsuranceId")
-})
+@NamedQuery(name = HealthInsurance.GET_ALL_HEALTH_INSURANCE_BY_EMPLOYEE_ID, query = "from HealthInsurance h where h.employee.id =:employeeId")
+@NamedQuery(name = HealthInsurance.GET_HEALTH_INSURANCE_BY_EMPLOYEE_ID_AND_HEALTH_INSURANCE_ID, query = "from HealthInsurance h where h.employee.id=:employeeId and h.id=:healthInsuranceId")
 public class HealthInsurance {
     private static final String QUALIFIER = "com.axonactive.jpa.entities";
     public static final String GET_ALL_HEALTH_INSURANCE_BY_EMPLOYEE_ID = QUALIFIER + "getAllHealthInsuranceByEmployeeId";
@@ -38,7 +36,7 @@ public class HealthInsurance {
     @Column(name = "register_hospital", nullable = false)
     private String registerHospital;
 
-    @Column(name = "expiration_date",nullable = false)
+    @Column(name = "expiration_date", nullable = false)
     private LocalDate expirationDate;
 
 }

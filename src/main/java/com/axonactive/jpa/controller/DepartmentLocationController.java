@@ -12,38 +12,38 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class DepartmentLocationController {
     @Inject
-    private DepartmentLocationService DepartmentLocationService;
+    private DepartmentLocationService departmentLocationService;
 
     @GET
     public Response getAllLocationByDepartment(@PathParam("departmentId") int departmentId){
-        return Response.ok(DepartmentLocationService.getAllLocationByDepartment(departmentId)).build();
+        return Response.ok(departmentLocationService.getAllLocationByDepartment(departmentId)).build();
     }
 
     @GET
     @Path("/{locationId}")
     public Response getDepartmentLocationById(@PathParam("departmentId") int departmentId, @PathParam("locationId") int locationId){
-        return Response.ok(DepartmentLocationService.getDepartmentLocationById(departmentId,locationId)).build();
+        return Response.ok(departmentLocationService.getDepartmentLocationById(departmentId,locationId)).build();
     }
 
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addDepartmentLocation(@PathParam("departmentId") int departmentId, DepartmentLocationRequest DepartmentLocationRequest){
-        return Response.ok(DepartmentLocationService.addDepartmentLocation(departmentId, DepartmentLocationRequest)).build();
+    public Response addDepartmentLocation(@PathParam("departmentId") int departmentId, DepartmentLocationRequest departmentLocationRequest){
+        return Response.ok(departmentLocationService.addDepartmentLocation(departmentId, departmentLocationRequest)).build();
 
     }
 
     @DELETE
     @Path("/{locationId}")
     public Response deleteDepartmentLocation(@PathParam("departmentId") int departmentId, @PathParam("locationId") int locationId){
-        DepartmentLocationService.deleteDepartmentLocation(departmentId,locationId);
+        departmentLocationService.deleteDepartmentLocation(departmentId,locationId);
         return Response.ok().build();
     }
 
     @PUT
     @Path("/{locationId}")
-    public Response updateDepartmentLocation(@PathParam("departmentId") int departmentId,@PathParam("locationId") int locationId, DepartmentLocationRequest DepartmentLocationRequest){
-        return Response.ok(DepartmentLocationService.updateDepartmentLocation(departmentId,locationId,DepartmentLocationRequest)).build();
+    public Response updateDepartmentLocation(@PathParam("departmentId") int departmentId,@PathParam("locationId") int locationId, DepartmentLocationRequest departmentLocationRequest){
+        return Response.ok(departmentLocationService.updateDepartmentLocation(departmentId,locationId,departmentLocationRequest)).build();
     }
     
     
