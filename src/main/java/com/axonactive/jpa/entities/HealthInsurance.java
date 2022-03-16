@@ -1,7 +1,9 @@
 package com.axonactive.jpa.entities;
 
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
@@ -10,6 +12,8 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "health_insurance")
 @NamedQuery(name = HealthInsurance.GET_ALL_HEALTH_INSURANCE_BY_EMPLOYEE_ID, query = "from HealthInsurance h where h.employee.id =:employeeId")
 @NamedQuery(name = HealthInsurance.GET_HEALTH_INSURANCE_BY_EMPLOYEE_ID_AND_HEALTH_INSURANCE_ID, query = "from HealthInsurance h where h.employee.id=:employeeId and h.id=:healthInsuranceId")

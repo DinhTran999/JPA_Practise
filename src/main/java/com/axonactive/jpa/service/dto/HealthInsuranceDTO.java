@@ -10,6 +10,8 @@ import java.time.LocalDate;
 @Getter
 public class HealthInsuranceDTO {
     @NotNull
+    private Integer id;
+    @NotNull
     private String code;
     @NotNull
     private String address;

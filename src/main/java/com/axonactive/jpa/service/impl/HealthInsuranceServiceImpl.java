@@ -12,10 +12,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Objects;
 
 import static com.axonactive.jpa.constant.Constant.EMPLOYEE_ID_PARAMETER_NAME_SQL;
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @RequestScoped
 @Transactional
@@ -37,7 +40,7 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
         return healthInsuranceMapper.HealthInsurancesToHealthInsuranceDTOs(namedQuery.getResultList());
     }
 
-    private HealthInsurance getHealthInsuranceByEmployeeIdAndHealthInsuranceIdHelper(int employeeId, int healthInsuranceId){
+    private HealthInsurance getHealthInsuranceByEmployeeIdAndHealthInsuranceIdFromDataBase(int employeeId, int healthInsuranceId){
         TypedQuery<HealthInsurance> namedQuery = em.createNamedQuery(HealthInsurance.GET_HEALTH_INSURANCE_BY_EMPLOYEE_ID_AND_HEALTH_INSURANCE_ID, HealthInsurance.class);
         namedQuery.setParameter(EMPLOYEE_ID_PARAMETER_NAME_SQL,employeeId);
         namedQuery.setParameter("healthInsuranceId",healthInsuranceId);
@@ -46,7 +49,7 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
 
     @Override
     public HealthInsuranceDTO getHealthInsuranceByEmployeeIdAndHealthInsuranceId(int employeeId, int healthInsuranceId) {
-        return healthInsuranceMapper.HealthInsuranceToHealthInsuranceDTO(getHealthInsuranceByEmployeeIdAndHealthInsuranceIdHelper(employeeId,healthInsuranceId));
+        return healthInsuranceMapper.HealthInsuranceToHealthInsuranceDTO(getHealthInsuranceByEmployeeIdAndHealthInsuranceIdFromDataBase(employeeId,healthInsuranceId));
     }
 
     @Override
@@ -54,23 +57,27 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
         HealthInsurance healthInsurance = healthInsuranceMapper.HealthInsuranceDTOToHealthInsurance(healthInsuranceDTO);
         healthInsurance.setEmployee(employeeService.getEmployeeByIdFromDataBase(employeeId));
         em.persist(healthInsurance);
-        return healthInsuranceMapper.HealthInsuranceToHealthInsuranceDTO(healthInsurance);
+        return healthInsuranceDTO;
     }
 
     @Override
     public void deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(int employeeId, int healthInsuranceId) {
-        HealthInsurance healthInsurance = getHealthInsuranceByEmployeeIdAndHealthInsuranceIdHelper(employeeId, healthInsuranceId);
+        HealthInsurance healthInsurance = getHealthInsuranceByEmployeeIdAndHealthInsuranceIdFromDataBase(employeeId, healthInsuranceId);
         if(Objects.nonNull(healthInsurance)) em.remove(healthInsurance);
     }
 
     @Override
     public HealthInsuranceDTO updateHealthInsurance(int employeeId, int healthInsuranceId, HealthInsuranceDTO healthInsuranceDTO) {
-        HealthInsurance healthInsurance = getHealthInsuranceByEmployeeIdAndHealthInsuranceIdHelper(employeeId, healthInsuranceId);
-        healthInsurance.setCode(healthInsuranceDTO.getCode());
-        healthInsurance.setAddress(healthInsuranceDTO.getAddress());
-        healthInsurance.setRegisterHospital(healthInsuranceDTO.getRegisterHospital());
-        healthInsurance.setExpirationDate(healthInsuranceDTO.getExpirationDate());
-        return healthInsuranceMapper.HealthInsuranceToHealthInsuranceDTO(em.merge(healthInsurance));
+        HealthInsurance healthInsurance = getHealthInsuranceByEmployeeIdAndHealthInsuranceIdFromDataBase(employeeId, healthInsuranceId);
+        if(Objects.nonNull(healthInsurance)){
+            healthInsurance.setCode(healthInsuranceDTO.getCode());
+            healthInsurance.setAddress(healthInsuranceDTO.getAddress());
+            healthInsurance.setRegisterHospital(healthInsuranceDTO.getRegisterHospital());
+            healthInsurance.setExpirationDate(healthInsuranceDTO.getExpirationDate());
+            em.merge(healthInsurance);
+            return healthInsuranceDTO;
+        }
+        throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không tồn tại Health insurance card với Id: "+healthInsuranceId).build());
     }
 
 }
