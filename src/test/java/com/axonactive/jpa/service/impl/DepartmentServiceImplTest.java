@@ -33,7 +33,7 @@ class DepartmentServiceImplTest {
     List<Department> expectedDepartmentList = Arrays.asList(departmentA, departmentB, departmentC);
 
     @InjectMocks
-    private DepartmentServiceImpl departmentService;
+    private DepartmentServiceImplOrigin departmentService;
 
     @Mock
     private EmployeeServiceImpl employeeService;

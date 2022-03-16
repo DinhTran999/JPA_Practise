@@ -3,14 +3,14 @@ package com.axonactive.jpa.service.impl;
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.exeption.NoSuchDepartmentException;
+import com.axonactive.jpa.service.DepartmentService;
 import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
-import com.axonactive.jpa.service.persistence.AbstractCRUDBean;
-import com.axonactive.jpa.service.persistence.PersistenceService;
-import com.axonactive.jpa.service.persistence.PersistenceServiceImpl;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -21,27 +21,36 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @RequestScoped
 @Transactional
-public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
-    @Inject
-    PersistenceService<Department> persistenceService;
+public class DepartmentServiceImplOrigin implements DepartmentService {
+
+    @PersistenceContext(unitName = "jpa")
+    private EntityManager em;
 
     @Inject
-    EmployeeService employeeService;
+    private EmployeeService employeeService;
 
-    public Department saveDepartment (DepartmentRequest departmentRequest) {
-        Department department = new Department();
-        department.setName(departmentRequest.getName());
-        department.setStartDate(departmentRequest.getStartDate());
-        return save(department);
+    @Override
+    public Department getDepartmentById(int id) {
+        return em.find(Department.class,id);
     }
 
     @Override
-    protected PersistenceService<Department> getPersistenceService() {
-        return persistenceService;
+    public List<Department> getAllDepartment() {
+        return em.createNamedQuery(Department.GET_ALL,Department.class).getResultList();
     }
 
+    @Override
+    public Department addDepartment(DepartmentRequest departmentRequest) {
+        Department department = new Department();
+        department.setName(departmentRequest.getName());
+        department.setStartDate(departmentRequest.getStartDate());
+        em.persist(department);
+        return department;
+    }
+
+    @Override
     public void deleteDepartment(int id) {
-        Department department = findById(id);
+        Department department = getDepartmentById(id);
         if(Objects.isNull(department)){
             throw new NoSuchDepartmentException();
 //            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không tồn tại Department này").build());
@@ -49,7 +58,7 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
         if(isDepartmentHasEmployees(id)){
             throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Department có employee không thể xóa").build());
         }
-        removeEntity(department);
+        em.remove(department);
     }
 
     private boolean isDepartmentHasEmployees(int departmentId){
@@ -57,11 +66,14 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
         return !employeeDTOList.isEmpty();
     }
 
+    @Override
     public Department updateDepartment(int id, DepartmentRequest departmentRequest) {
-        Department department = findById(id);
+        Department department = getDepartmentById(id);
         department.setName(departmentRequest.getName());
         department.setStartDate(departmentRequest.getStartDate());
-        return update(department);
+        em.merge(department);
+        return department;
     }
+
 
 }

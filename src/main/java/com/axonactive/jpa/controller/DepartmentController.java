@@ -2,6 +2,7 @@ package com.axonactive.jpa.controller;
 
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.service.DepartmentService;
+import com.axonactive.jpa.service.impl.DepartmentServiceImpl;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -13,25 +14,25 @@ import javax.ws.rs.core.Response;
 public class DepartmentController {
 
     @Inject
-    private DepartmentService departmentService;
+    private DepartmentServiceImpl departmentService;
 
     @GET
     public Response getAllDepartments(){
-        return Response.ok(departmentService.getAllDepartment()).build();
+        return Response.ok(departmentService.findAll()).build();
     }
 
 
     @GET
     @Path("/{id}")
     public Response getDepartmentById(@PathParam("id") int id){
-        return Response.ok(departmentService.getDepartmentById(id)).build();
+        return Response.ok(departmentService.findById(id)).build();
     }
 
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response addDepartment(DepartmentRequest departmentRequest){
-        return Response.ok(departmentService.addDepartment(departmentRequest)).build();
+        return Response.ok(departmentService.saveDepartment(departmentRequest)).build();
 
     }
 
