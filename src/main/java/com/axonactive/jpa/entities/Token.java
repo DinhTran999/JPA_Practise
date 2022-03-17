@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Token {
-    private String token;
+    private String tokenStr;
     private int timeToLive;
 }

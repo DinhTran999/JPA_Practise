@@ -28,16 +28,16 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
     @Inject
     EmployeeService employeeService;
 
+    @Override
+    protected PersistenceService<Department> getPersistenceService() {
+        return persistenceService;
+    }
+
     public Department saveDepartment (DepartmentRequest departmentRequest) {
         Department department = new Department();
         department.setName(departmentRequest.getName());
         department.setStartDate(departmentRequest.getStartDate());
         return save(department);
-    }
-
-    @Override
-    protected PersistenceService<Department> getPersistenceService() {
-        return persistenceService;
     }
 
     public void deleteDepartment(int id) {
@@ -52,16 +52,16 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
         removeEntity(department);
     }
 
-    private boolean isDepartmentHasEmployees(int departmentId){
-        List<EmployeeDTO> employeeDTOList = employeeService.getAllEmployeeByDepartment(departmentId);
-        return !employeeDTOList.isEmpty();
-    }
-
     public Department updateDepartment(int id, DepartmentRequest departmentRequest) {
         Department department = findById(id);
         department.setName(departmentRequest.getName());
         department.setStartDate(departmentRequest.getStartDate());
         return update(department);
+    }
+
+    private boolean isDepartmentHasEmployees(int departmentId){
+        List<EmployeeDTO> employeeDTOList = employeeService.getAllEmployeeByDepartment(departmentId);
+        return !employeeDTOList.isEmpty();
     }
 
 }

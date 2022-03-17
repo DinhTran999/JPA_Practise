@@ -53,7 +53,6 @@ public class DepartmentServiceImplOrigin implements DepartmentService {
         Department department = getDepartmentById(id);
         if(Objects.isNull(department)){
             throw new NoSuchDepartmentException();
-//            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không tồn tại Department này").build());
         }
         if(isDepartmentHasEmployees(id)){
             throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Department có employee không thể xóa").build());

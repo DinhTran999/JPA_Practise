@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import com.axonactive.jpa.controller.request.UserRequest;
 import com.axonactive.jpa.entities.Token;
 import com.axonactive.jpa.entities.User;
 import com.axonactive.jpa.exeption.UnAuthorizedException;
@@ -27,8 +28,8 @@ public class JWTAuthenticationServices {
     @Inject
     UserServiceImpl userService;
 
-    public Token createToken(User user) {
-        validateUser(user);
+    public Token createToken(UserRequest userRequest) {
+        validateUser(userRequest);
 
         String token = null;
         String secretKey = AppConfigService.getSecretKey();
@@ -40,7 +41,7 @@ public class JWTAuthenticationServices {
             token = JWT.create()
                     .withIssuer(issuer)
                     .withJWTId(UUID.randomUUID().toString())
-                    .withClaim("username", user.getName())
+                    .withClaim("username", userRequest.getName())
                     .withExpiresAt(this.setTokenTimeToLive(timeToLive))
                     .sign(algorithm);
         } catch (IllegalArgumentException e) {
@@ -52,8 +53,6 @@ public class JWTAuthenticationServices {
             throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Could not create Token").build());
         }
         return new Token(token, timeToLive);
-
-
     }
 
     public void checkAuthorizedToken(String authorization) {
@@ -77,8 +76,8 @@ public class JWTAuthenticationServices {
 
     }
 
-    private void validateUser(User user) {
-        User userInDataBase = userService.findUserByNameAndPassword(user.getName(), user.getPassword());
+    private void validateUser(UserRequest userRequest) {
+        User userInDataBase = userService.findUserByNameAndPassword(userRequest.getName(), userRequest.getPassword());
         if (Objects.isNull(userInDataBase)) {
 //            throw new WebApplicationException(Response.status(FORBIDDEN).entity("User not in system").build());
             throw new UnAuthorizedException();

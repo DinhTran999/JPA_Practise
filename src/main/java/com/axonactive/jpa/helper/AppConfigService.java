@@ -3,6 +3,9 @@ package com.axonactive.jpa.helper;
 import java.util.ResourceBundle;
 
 public class AppConfigService {
+    private AppConfigService(){
+
+    }
     static ResourceBundle resourceBundle = Helper.getResourceBundle("appConfig");
 
     public static String getSecretKey(){

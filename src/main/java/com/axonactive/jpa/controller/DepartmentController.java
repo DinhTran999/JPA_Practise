@@ -34,6 +34,7 @@ public class DepartmentController {
 
     @GET
     @Path("/{id}")
+    @ApiOperation("get department by Id")
     public Response getDepartmentById(@HeaderParam("Authorization") String authorization,@PathParam("id") int id){
         jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.findById(id)).build();
@@ -42,6 +43,7 @@ public class DepartmentController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation("add department")
     public Response addDepartment(@HeaderParam("Authorization") String authorization,DepartmentRequest departmentRequest){
         jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.saveDepartment(departmentRequest)).build();
@@ -50,6 +52,7 @@ public class DepartmentController {
 
     @DELETE
     @Path("/{id}")
+    @ApiOperation("delete department")
     public Response deleteDepartment(@HeaderParam("Authorization") String authorization,@PathParam("id") int id){
         jwtAuthenticationServices.checkAuthorizedToken(authorization);
         departmentService.deleteDepartment(id);
@@ -58,6 +61,7 @@ public class DepartmentController {
 
     @PUT
     @Path("/{id}")
+    @ApiOperation("update department")
     public Response updateDepartment(@HeaderParam("Authorization") String authorization,@PathParam("id") int id, DepartmentRequest departmentRequest){
         jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.updateDepartment(id,departmentRequest)).build();
