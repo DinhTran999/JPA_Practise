@@ -75,7 +75,7 @@ public class PersistenceServiceImpl<T extends IEntity> implements PersistenceSer
     @Override
     public List<T> findAll() {
         String className = getPersistentClass().getSimpleName();
-        return em.createQuery("from "+className).getResultList();
+        return em.createQuery("from "+className,getPersistentClass()).getResultList();
     }
 
     @Override
@@ -85,7 +85,6 @@ public class PersistenceServiceImpl<T extends IEntity> implements PersistenceSer
 
     @Override
     public TypedQuery<T> createTypeQuery(String query) {
-        System.out.println(getPersistentClass().getSimpleName());
         return this.em.createQuery(query,getPersistentClass());
     }
 
