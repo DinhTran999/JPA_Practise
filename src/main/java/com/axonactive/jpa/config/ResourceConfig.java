@@ -20,8 +20,8 @@ public class ResourceConfig extends Application {
         beanConfig.setBasePath("/JPA-1.0-SNAPSHOT/api");
 //        beanConfig.setResourcePackage("com.axonactive.jpa");
         beanConfig.setResourcePackage(DepartmentController.class.getPackage().getName());
-        beanConfig.setTitle("RESTEasy, Swagger and Swagger UI Example");
-        beanConfig.setDescription("Sample RESTful API built using RESTEasy, Swagger and Swagger UI");
+        beanConfig.setTitle("Company Management API Definition");
+        beanConfig.setDescription("RESTful API built using RESTEasy, Swagger and Swagger UI");
         beanConfig.setScan(true);
     }
 }

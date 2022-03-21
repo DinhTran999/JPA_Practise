@@ -26,7 +26,7 @@ public class DepartmentLocationServiceImpl implements DepartmentLocationService 
     private EntityManager em;
 
     @Inject
-    private DepartmentService departmentService;
+    private DepartmentServiceImpl departmentService;
 
     public DepartmentLocation getDepartmentLocationByIdHelper(int departmentId, int locationId) throws NoResultException {
         TypedQuery<DepartmentLocation> namedQuery = em.createNamedQuery(DepartmentLocation.GET_LOCATION_BY_ID, DepartmentLocation.class);
@@ -34,6 +34,7 @@ public class DepartmentLocationServiceImpl implements DepartmentLocationService 
         namedQuery.setParameter("locationId", locationId);
         return namedQuery.getSingleResult();
     }
+
     @Override
     public List<DepartmentLocationDTO> getAllLocationByDepartment(int departmentId) {
         TypedQuery<DepartmentLocation> namedQuery = em.createNamedQuery(DepartmentLocation.GET_ALL, DepartmentLocation.class);
@@ -44,24 +45,22 @@ public class DepartmentLocationServiceImpl implements DepartmentLocationService 
 
     @Override
     public DepartmentLocationDTO getDepartmentLocationById(int departmentId, int locationId) throws NoResultException {
-        return DepartmentLocationMapper.INSTANCE.DepartmentLocationToDepartmentLocationDto(getDepartmentLocationByIdHelper(departmentId,locationId));
+        return DepartmentLocationMapper.INSTANCE.DepartmentLocationToDepartmentLocationDto(getDepartmentLocationByIdHelper(departmentId, locationId));
     }
 
     @Override
     public DepartmentLocationDTO addDepartmentLocation(int departmentId, DepartmentLocationRequest departmentLocationRequest) {
         DepartmentLocation departmentLocation = new DepartmentLocation();
         departmentLocation.setLocation(departmentLocationRequest.getLocation());
-        departmentLocation.setDepartment(departmentService.getDepartmentById(departmentId));
+        departmentLocation.setDepartment(departmentService.findById(departmentId));
         em.persist(departmentLocation);
         return DepartmentLocationMapper.INSTANCE.DepartmentLocationToDepartmentLocationDto(departmentLocation);
     }
 
 
-
-
     @Override
-    public void deleteDepartmentLocation(int departmentId,int locationId) throws NoResultException {
-        DepartmentLocation departmentLocation = getDepartmentLocationByIdHelper(departmentId,locationId);
+    public void deleteDepartmentLocation(int departmentId, int locationId) throws NoResultException {
+        DepartmentLocation departmentLocation = getDepartmentLocationByIdHelper(departmentId, locationId);
         if (Objects.nonNull(departmentLocation)) {
             em.remove(departmentLocation);
         }
@@ -69,8 +68,8 @@ public class DepartmentLocationServiceImpl implements DepartmentLocationService 
     }
 
     @Override
-    public DepartmentLocationDTO updateDepartmentLocation (int departmentId,int locationId, DepartmentLocationRequest departmentLocationRequest) throws NoResultException {
-        DepartmentLocation departmentLocation = getDepartmentLocationByIdHelper(departmentId,locationId);
+    public DepartmentLocationDTO updateDepartmentLocation(int departmentId, int locationId, DepartmentLocationRequest departmentLocationRequest) throws NoResultException {
+        DepartmentLocation departmentLocation = getDepartmentLocationByIdHelper(departmentId, locationId);
         departmentLocation.setLocation(departmentLocationRequest.getLocation());
         em.merge(departmentLocation);
         return DepartmentLocationMapper.INSTANCE.DepartmentLocationToDepartmentLocationDto(departmentLocation);

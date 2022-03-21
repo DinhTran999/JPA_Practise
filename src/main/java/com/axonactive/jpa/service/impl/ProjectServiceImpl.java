@@ -2,7 +2,6 @@ package com.axonactive.jpa.service.impl;
 
 import com.axonactive.jpa.controller.request.ProjectRequest;
 import com.axonactive.jpa.entities.Project;
-import com.axonactive.jpa.service.DepartmentService;
 import com.axonactive.jpa.service.ProjectService;
 import com.axonactive.jpa.service.dto.ProjectDTO;
 import com.axonactive.jpa.service.mapper.ProjectMapper;
@@ -25,7 +24,7 @@ public class ProjectServiceImpl implements ProjectService {
     private EntityManager em;
 
     @Inject
-    private DepartmentService departmentService;
+    private DepartmentServiceImpl departmentService;
 
     private Project getProjectByIdDepartmentIdAndProjectIdHelper(int departmentId, int projectId){
         TypedQuery<Project> namedQuery = em.createNamedQuery(Project.GET_PROJECT_BY_ID, Project.class);
@@ -60,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = new Project();
         project.setArea(projectRequest.getArea());
         project.setName(projectRequest.getName());
-        project.setDepartment(departmentService.getDepartmentById(departmentId));
+        project.setDepartment(departmentService.findById(departmentId));
         em.persist(project);
         return ProjectMapper.INSTANCE.ProjectToProjectDto(project);
     }

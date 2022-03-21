@@ -4,6 +4,7 @@ import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.exeption.NoSuchDepartmentException;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.persistence.PersistenceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,7 +34,10 @@ class DepartmentServiceImplTest {
     List<Department> expectedDepartmentList = Arrays.asList(departmentA, departmentB, departmentC);
 
     @InjectMocks
-    private DepartmentServiceImplOrigin departmentService;
+    private DepartmentServiceImpl departmentService;
+
+    @Mock
+    private PersistenceService<Department> persistenceService;
 
     @Mock
     private EmployeeServiceImpl employeeService;
@@ -46,9 +50,10 @@ class DepartmentServiceImplTest {
 
     @Test
     void getAllDepartment_ShouldReturnRightListDepartment() {
-        when(mockQuery.getResultList()).thenReturn(expectedDepartmentList);
-        when(entityManager.createNamedQuery(Department.GET_ALL,Department.class)).thenReturn(mockQuery);
-        List<Department> actualDepartmentList = departmentService.getAllDepartment();
+//        when(mockQuery.getResultList()).thenReturn(expectedDepartmentList);
+//        when(entityManager.createNamedQuery(Department.GET_ALL,Department.class)).thenReturn(mockQuery);
+        when(persistenceService.findAll()).thenReturn(expectedDepartmentList);
+        List<Department> actualDepartmentList = departmentService.findAll();
         assertThat(expectedDepartmentList,containsInAnyOrder(actualDepartmentList.toArray()));
     }
 
@@ -58,16 +63,18 @@ class DepartmentServiceImplTest {
         Department expectedDepartment = expectedDepartmentList.stream()
                 .filter(d->d.getId()==departmentId)
                 .findFirst().get();
-        when(entityManager.find(Department.class,departmentId)).thenReturn(expectedDepartment);
-        Department actualDepartment = departmentService.getDepartmentById(departmentId);
+//        when(entityManager.find(Department.class,departmentId)).thenReturn(expectedDepartment);
+        when(persistenceService.findById(departmentId)).thenReturn(expectedDepartment);
+        Department actualDepartment = departmentService.findById(departmentId);
         assertEquals(expectedDepartment,actualDepartment);
     }
 
     @Test
     void getDepartmentById_GetIdNotHasDepartment_ShouldReturnNull() {
         int departmentId = 6;
-        when(entityManager.find(Department.class,departmentId)).thenReturn(null);
-        Department actualDepartment = departmentService.getDepartmentById(departmentId);
+//        when(entityManager.find(Department.class,departmentId)).thenReturn(null);
+        when(persistenceService.findById(departmentId)).thenReturn(null);
+        Department actualDepartment = departmentService.findById(departmentId);
         assertNull(actualDepartment);
     }
 
@@ -82,13 +89,12 @@ class DepartmentServiceImplTest {
         Department expectedDepartment = new Department(4,"A",LocalDate.of(2020,11,20));
 
         //get actual result
-        Department actualDepartment = departmentService.addDepartment(departmentRequest);
+        when(persistenceService.save(any(Department.class))).thenReturn(expectedDepartment);
+        Department actualDepartment = departmentService.saveDepartment(departmentRequest);
 
-        assertEquals(departmentRequest.getName(),actualDepartment.getName());
-        assertEquals(departmentRequest.getStartDate(),actualDepartment.getStartDate());
-
+        assertEquals(expectedDepartment,actualDepartment);
         //verify
-        verify(entityManager,times(1)).persist(any(Department.class));
+//        verify(entityManager).persist(any(Department.class));
 
     }
 

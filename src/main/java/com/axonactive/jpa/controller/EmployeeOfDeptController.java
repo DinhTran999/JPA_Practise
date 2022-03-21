@@ -5,6 +5,7 @@ import com.axonactive.jpa.controller.request.EmployeeOfDepartmentRequest;
 import com.axonactive.jpa.service.EmployeeService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -30,7 +31,7 @@ public class EmployeeOfDeptController {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response addEmployee(@PathParam("departmentId") int departmentId, EmployeeOfDepartmentRequest employeeRequest){
+    public Response addEmployee(@PathParam("departmentId") int departmentId,@Valid EmployeeOfDepartmentRequest employeeRequest){
         return Response.ok(employeeService.addEmployeeByDepartmentId(departmentId, employeeRequest)).build();
 
     }

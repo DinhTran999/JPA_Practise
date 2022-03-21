@@ -7,7 +7,6 @@ import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
 import com.axonactive.jpa.service.persistence.AbstractCRUDBean;
 import com.axonactive.jpa.service.persistence.PersistenceService;
-import com.axonactive.jpa.service.persistence.PersistenceServiceImpl;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

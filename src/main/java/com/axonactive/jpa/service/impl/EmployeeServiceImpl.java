@@ -5,7 +5,6 @@ import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.enumerate.Gender;
-import com.axonactive.jpa.service.DepartmentService;
 import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
 import com.axonactive.jpa.service.dto.EmployeeGroupByDepartmentDTO;
@@ -14,6 +13,7 @@ import com.axonactive.jpa.service.mapper.EmployeeMapper;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
@@ -39,7 +39,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeMapper employeeMapper;
 
     @Inject
-    DepartmentService departmentService;
+    DepartmentServiceImpl departmentService;
 
     @Override
     public List<EmployeeDTO> getAllEmployeeByDepartment(int departmentId) {
@@ -58,7 +58,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         TypedQuery<Employee> namedQuery = em.createNamedQuery(Employee.GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID, Employee.class);
         namedQuery.setParameter("departmentId", departmentId);
         namedQuery.setParameter("employeeId", employeeId);
-        return namedQuery.getSingleResult();
+        try {
+            return namedQuery.getSingleResult();
+        } catch (NoResultException e){
+            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Can not find the employee with department id: "+departmentId+
+                    " and employeeId: "+employeeId).build());
+        }
     }
 
 
@@ -66,7 +71,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDTO addEmployeeByDepartmentId(int departmentId, EmployeeOfDepartmentRequest employeeRequest) {
         Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
-        employee.setDepartment(departmentService.getDepartmentById(departmentId));
+        employee.setDepartment(departmentService.findById(departmentId));
         em.persist(employee);
         return employeeMapper.EmployeeToEmployeeDto(employee);
     }
@@ -136,7 +141,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     @Override
     public EmployeeDTO addEmployee(EmployeeRequest employeeRequest) {
         Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
-        employee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+        employee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
         em.persist(employee);
         return employeeMapper.EmployeeToEmployeeDto(employee);
     }
@@ -157,7 +162,7 @@ public class EmployeeServiceImpl implements EmployeeService {
             employee.setDateOfBirth(employeeRequest.getDateOfBirth());
             employee.setGender(employeeRequest.getGender());
             employee.setSalary(employeeRequest.getSalary());
-            employee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+            employee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
             return employeeMapper.EmployeeToEmployeeDto(em.merge(employee));
         }
         throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không có Employee với Id: "+employeeId).build());
