@@ -1,6 +1,6 @@
 package com.axonactive.jpa.service.mapper;
 
-import com.axonactive.jpa.controller.request.EmployeeOfDepartmentRequest;
+import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.service.dto.EmployeeDTO;
 import org.mapstruct.AfterMapping;
@@ -18,7 +18,7 @@ public interface EmployeeMapper {
 
     List<EmployeeDTO> EmployeesToEmployeeDtos(List<Employee> employeeList);
 
-    Employee EmployeeRequestToEmployee(EmployeeOfDepartmentRequest employeeRequest);
+    Employee EmployeeRequestToEmployee(EmployeeRequest employeeRequest);
 
     @AfterMapping
     default void getFullName(Employee employee, @MappingTarget EmployeeDTO employeeDTO) {
