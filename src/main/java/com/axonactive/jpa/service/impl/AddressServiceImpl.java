@@ -28,7 +28,7 @@ public class AddressServiceImpl implements AddressService {
     EntityManager em;
 
     @Inject
-    EmployeeService employeeService;
+    EmployeeServiceImpl employeeService;
 
     @Inject
     AddressMapper addressMapper;
@@ -41,7 +41,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressDTO addAddress(int employeeId, AddressDTO addressDTO) {
         Address address = addressMapper.AddressDTOToAddress(addressDTO);
-        address.setEmployee(employeeService.getEmployeeByIdFromDataBase(employeeId));
+        address.setEmployee(employeeService.findById(employeeId));
         em.persist(address);
         return addressMapper.AddressToAddressDto(address);
     }

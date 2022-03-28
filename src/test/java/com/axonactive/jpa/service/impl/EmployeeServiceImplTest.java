@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -69,7 +70,7 @@ class EmployeeServiceImplTest {
         Employee expectedEmployee = getEmployeeFromTestListById(employeeIdToBeFind);
         when(entityManager.find(Employee.class, employeeIdToBeFind))
                 .thenReturn(expectedEmployee);
-        Employee actualEmployee = employeeService.getEmployeeByIdFromDataBase(employeeIdToBeFind);
+        Employee actualEmployee = employeeService.findById(employeeIdToBeFind);
         assertEquals(expectedEmployee, actualEmployee);
     }
 
@@ -78,7 +79,7 @@ class EmployeeServiceImplTest {
         int employeeIdToBeFind = 11;
         when(entityManager.find(Employee.class, employeeIdToBeFind))
                 .thenReturn(null);
-        Employee actualEmployee = employeeService.getEmployeeByIdFromDataBase(employeeIdToBeFind);
+        Employee actualEmployee = employeeService.findById(employeeIdToBeFind);
         assertNull(actualEmployee);
     }
 
@@ -91,7 +92,7 @@ class EmployeeServiceImplTest {
         EmployeeDTO expectedEmployeeDTO = employeeToEmployeeDTO(expectedEmployee);
 
         //mock
-        when(employeeService.getEmployeeByIdFromDataBase(employeeIdToBeFind)).thenReturn(expectedEmployee);
+        when(employeeService.findById(employeeIdToBeFind)).thenReturn(expectedEmployee);
         when(employeeMapper.EmployeeToEmployeeDto(expectedEmployee)).thenReturn(expectedEmployeeDTO);
 
         //actual
@@ -154,14 +155,14 @@ class EmployeeServiceImplTest {
     void deleteEmployeeById_RightEmployeeId_ShouldDeleteEmployee() {
         Employee employeeToBeDelete = employeeList.get(0);
         when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(employeeToBeDelete);
-        employeeService.deleteEmployeeById(employeeToBeDelete.getId());
+        employeeService.remove(employeeToBeDelete.getId());
         verify(entityManager).remove(employeeToBeDelete);
     }
 
     @Test
     void deleteEmployeeById_WrongEmployeeId_ShouldNotDeleteEmployee() {
         when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(null);
-        employeeService.deleteEmployeeById(0);
+        employeeService.remove(0);
         verify(entityManager, never()).remove(any(Employee.class));
     }
 
@@ -235,5 +236,13 @@ class EmployeeServiceImplTest {
                 .filter(e -> e.getId() == employeeIdToBeFind)
                 .findFirst()
                 .get();
+    }
+
+    @Test
+    void test(){
+        List<String> list = employeeList.stream().map(x->x.getLastName()).collect(Collectors.toList());
+        list.forEach(System.out::println);
+
+
     }
 }

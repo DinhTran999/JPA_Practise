@@ -2,6 +2,7 @@ package com.axonactive.jpa.controller;
 
 import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.service.EmployeeService;
+import com.axonactive.jpa.service.impl.EmployeeServiceImpl;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -13,7 +14,7 @@ import javax.ws.rs.core.Response;
 @Consumes(MediaType.APPLICATION_JSON)
 public class EmployeeController {
     @Inject
-    EmployeeService employeeService;
+    EmployeeServiceImpl employeeService;
 
     @GET
     public Response getAllEmployees(){
@@ -35,7 +36,7 @@ public class EmployeeController {
     @DELETE
     @Path("/{employeeId}")
     public Response deleteEmployeeById(@PathParam("employeeId") int employeeId){
-        employeeService.deleteEmployeeById(employeeId);
+        employeeService.remove(employeeId);
         return Response.ok().build();
 
     }

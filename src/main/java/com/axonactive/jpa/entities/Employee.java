@@ -1,6 +1,7 @@
 package com.axonactive.jpa.entities;
 
 import com.axonactive.jpa.enumerate.Gender;
+import com.axonactive.jpa.service.persistence.IEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -24,7 +25,7 @@ import java.time.LocalDate;
 @NamedQuery(name = Employee.GET_EMPLOYEE_BY_DEPTID_AND_EMPLOYEEID, query = "from Employee e where e.department.id = :departmentId and e.id = :employeeId")
 @NamedQuery(name = Employee.GET_EMPLOYEE_BY_ID, query = "from Employee e where e.id = :employeeId")
 @NamedQuery(name = Employee.GET_ALL, query = "from Employee")
-public class Employee {
+public class Employee implements IEntity {
     private static final String QUALIFIER = "com.axonactive.jpa.entities";
     public static final String GET_ALL_BY_DEPT_ID_AND_EMPLOYEE_ID = QUALIFIER + "getAllByDepartment";
     public static final String GET_ALL = QUALIFIER + "getAll";
@@ -62,5 +63,9 @@ public class Employee {
     @ManyToOne
     @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
     private Department department;
+
+    public Integer getId(){
+        return this.id;
+    }
 
 }

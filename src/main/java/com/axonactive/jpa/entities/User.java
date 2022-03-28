@@ -26,7 +26,7 @@ public class User implements IEntity {
     @Column(columnDefinition = "varchar(200)")
     private String password;
 
-    public int getId(){
+    public Integer getId(){
         return id;
     }
 }

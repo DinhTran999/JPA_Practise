@@ -37,7 +37,7 @@ public class Department implements IEntity {
     @Column(name = "start_date")
     private LocalDate startDate;
 
-    public int getId(){
+    public Integer getId(){
         return this.id;
     }
 

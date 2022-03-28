@@ -31,7 +31,7 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
     HealthInsuranceMapper healthInsuranceMapper;
 
     @Inject
-    EmployeeService employeeService;
+    EmployeeServiceImpl employeeService;
 
     @Override
     public List<HealthInsuranceDTO> getHealthInsuranceByEmployeeId(int employeeId) {
@@ -55,7 +55,7 @@ public class HealthInsuranceServiceImpl implements HealthInsuranceService {
     @Override
     public HealthInsuranceDTO addHealthInsurance(int employeeId, HealthInsuranceDTO healthInsuranceDTO) {
         HealthInsurance healthInsurance = healthInsuranceMapper.HealthInsuranceDTOToHealthInsurance(healthInsuranceDTO);
-        healthInsurance.setEmployee(employeeService.getEmployeeByIdFromDataBase(employeeId));
+        healthInsurance.setEmployee(employeeService.findById(employeeId));
         em.persist(healthInsurance);
         return healthInsuranceDTO;
     }

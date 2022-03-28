@@ -31,7 +31,7 @@ public class AssignmentImpl implements AssignmentService {
     private AssignmentMapper assignmentMapper;
 
     @Inject
-    private EmployeeService employeeService;
+    private EmployeeServiceImpl employeeService;
 
     @Inject
     private ProjectService projectService;
@@ -52,7 +52,7 @@ public class AssignmentImpl implements AssignmentService {
     @Override
     public AssignmentDTO addAssignment(AssignmentRequest assignmentRequest) {
         Assignment assignment = new Assignment();
-        assignment.setEmployee(employeeService.getEmployeeByIdFromDataBase(assignmentRequest.getEmployeeId()));
+        assignment.setEmployee(employeeService.findById(assignmentRequest.getEmployeeId()));
         assignment.setProject(projectService.getProjectByIdHepler(assignmentRequest.getProjectId()));
         em.persist(assignment);
         return assignmentMapper.AssignmentToAssignmentDto(assignment);
@@ -67,7 +67,7 @@ public class AssignmentImpl implements AssignmentService {
     @Override
     public AssignmentDTO updateAssignment(int assignmentId, AssignmentRequest assignmentRequest){
         Assignment assignment = getAssignmentByIdHelper(assignmentId);
-        assignment.setEmployee(employeeService.getEmployeeByIdFromDataBase(assignmentRequest.getEmployeeId()));
+        assignment.setEmployee(employeeService.findById(assignmentRequest.getEmployeeId()));
         assignment.setProject(projectService.getProjectByIdHepler(assignmentRequest.getProjectId()));
         return assignmentMapper.AssignmentToAssignmentDto(em.merge(assignment));
 
