@@ -3,7 +3,7 @@ package com.axonactive.jpa.service.impl;
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.exeption.NoSuchDepartmentException;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 import com.axonactive.jpa.service.persistence.PersistenceService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -120,7 +120,7 @@ class DepartmentServiceImplTest {
 
         //department will be deleted
         Department departmentToBeDelete = new Department(departmentId,"A",LocalDate.of(2021,11,9));
-        when(entityManager.find(Department.class,departmentId)).thenReturn(departmentToBeDelete);
+        when(persistenceService.findById(departmentId)).thenReturn(departmentToBeDelete);
 
         //list employees of department will be deleted
         List<EmployeeDTO> employeeDTOList = Arrays.asList(new EmployeeDTO(), new EmployeeDTO());
@@ -142,7 +142,7 @@ class DepartmentServiceImplTest {
         int departmentId = 7;
         //department will be deleted
         Department departmentToBeDelete = null;
-        when(entityManager.find(Department.class,departmentId)).thenReturn(departmentToBeDelete);
+        when(persistenceService.findById(departmentId)).thenReturn(departmentToBeDelete);
         assertThrows(NoSuchDepartmentException.class,()-> departmentService.deleteDepartment(departmentId));
     }
 

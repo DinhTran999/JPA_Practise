@@ -5,6 +5,7 @@ import com.axonactive.jpa.controller.request.AssignmentRequest;
 import com.axonactive.jpa.service.AssignmentService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,8 +19,8 @@ public class AssignmentController {
     private AssignmentService assignmentService;
 
     @GET
-    public Response getAssignments(AssignmentRequest assignmentRequest){
-        return Response.ok(assignmentService.getAssignments(assignmentRequest)).build();
+    public Response getAssignments(){
+        return Response.ok(assignmentService.getAssignments()).build();
     }
 
 
@@ -31,7 +32,7 @@ public class AssignmentController {
 
 
     @POST
-    public Response addAssignment(AssignmentRequest assignmentRequest){
+    public Response addAssignment(@Valid AssignmentRequest assignmentRequest){
         return Response.ok(assignmentService.addAssignment(assignmentRequest)).build();
 
     }
@@ -45,7 +46,7 @@ public class AssignmentController {
 
     @PUT
     @Path("/{id}")
-    public Response updateAssignment(@PathParam("id") int assignmentId, AssignmentRequest assignmentRequest){
+    public Response updateAssignment(@PathParam("id") int assignmentId,@Valid AssignmentRequest assignmentRequest){
         return Response.ok(assignmentService.updateAssignment(assignmentId,assignmentRequest)).build();
     }
 

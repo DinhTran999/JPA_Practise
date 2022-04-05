@@ -3,12 +3,10 @@ package com.axonactive.jpa.service.impl;
 import com.axonactive.jpa.controller.request.RelativeRequest;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.entities.Relative;
-import com.axonactive.jpa.enumerate.Gender;
 import com.axonactive.jpa.enumerate.Relationship;
-import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.RelativeService;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
-import com.axonactive.jpa.service.dto.EmployeeRelativeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeRelativeDTO;
 import com.axonactive.jpa.service.dto.RelativeDTO;
 import com.axonactive.jpa.service.mapper.EmployeeMapper;
 import com.axonactive.jpa.service.mapper.RelativeMapper;
@@ -109,7 +107,7 @@ public class RelativeServiceImpl implements RelativeService {
     }
 
     //employeeDTO +  relative where -> FATHER -> MOTHER -> ANYBODY ELSE
-    public Optional<Relative> getEmergencyRelative(List<Relative> relativeList){
+    private Optional<Relative> getEmergencyRelative(List<Relative> relativeList){
         Optional<Relative> emergencyRelative = getRelative(relativeList, Relationship.FATHER);
         if(emergencyRelative.isEmpty()){
             emergencyRelative = getRelative(relativeList, Relationship.MOTHER);
@@ -119,32 +117,25 @@ public class RelativeServiceImpl implements RelativeService {
         }
         return emergencyRelative;
     }
-
     private Optional<Relative> getRelative(List<Relative> relativeList, Relationship relationship){
         return relativeList.stream().filter(r ->
-                r.getRelationship().equals(relationship)
-        ).findAny();
+                r.getRelationship().equals(relationship)).findAny();
+    }
+    public List<EmployeeRelativeDTO> getEmployeeEmergencyRelative(){
+        return getAllrelatives().stream()
+                .collect(Collectors.groupingBy(Relative::getEmployee))
+                .entrySet().stream()
+                .map(employeeRelativesEntry ->{
+                    EmployeeDTO employeeDTO = employeeMapper.EmployeeToEmployeeDto(employeeRelativesEntry.getKey());
+                    List<RelativeDTO> relativeDTOS = new ArrayList<>();
+                    Optional<Relative> emergencyRelative = getEmergencyRelative(employeeRelativesEntry.getValue());
+                    emergencyRelative.ifPresent(relative -> relativeDTOS.add(relativeMapper.RelativeToRelativeDto(relative)));
+                    return new EmployeeRelativeDTO(employeeDTO, relativeDTOS);
+                }).collect(Collectors.toList());
     }
 
     private List<Relative> getAllrelatives(){
         return em.createQuery("from Relative", Relative.class)
                 .getResultList();
-    }
-
-    public List<EmployeeRelativeDTO> getEmployeeEmergencyRelative(){
-        return getAllrelatives().stream()
-                .collect(Collectors.groupingBy(Relative::getEmployee))
-                .entrySet()
-                .stream()
-                .map(employeeRelativesEntry ->{
-                    EmployeeDTO employeeDTO = employeeMapper.EmployeeToEmployeeDto(employeeRelativesEntry.getKey());
-                    List<RelativeDTO> relativeDTOS = new ArrayList<>();
-                    Optional<Relative> emergencyRelative = getEmergencyRelative(employeeRelativesEntry.getValue());
-                    if(!emergencyRelative.isEmpty()){
-                        relativeDTOS.add(relativeMapper.RelativeToRelativeDto(emergencyRelative.get()));
-                    }
-
-                    return new EmployeeRelativeDTO(employeeDTO, relativeDTOS);
-                }).collect(Collectors.toList());
     }
 }

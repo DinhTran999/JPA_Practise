@@ -26,13 +26,11 @@
         <mysqlConnector.version>8.0.25</mysqlConnector.version>
         <hibernateCore.version>5.5.9.Final</hibernateCore.version>
         <jersey-common.version>2.22.2</jersey-common.version>
+        <log4j.version>2.17.2</log4j.version>
     </properties>
 
 
-
-
     <dependencies>
-
 
 
         <!--For Testing Response-->
@@ -77,7 +75,6 @@
             <artifactId>hibernate-core</artifactId>
             <version>${hibernateCore.version}</version>
         </dependency>
-
 
 
         <dependency>
@@ -154,6 +151,18 @@
             <version>1.6.2</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
 
 
     </dependencies>

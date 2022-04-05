@@ -13,4 +13,6 @@ public class ProjectRequest {
 
     @NotNull
     private String area;
+
+    private Integer departmentId;
 }

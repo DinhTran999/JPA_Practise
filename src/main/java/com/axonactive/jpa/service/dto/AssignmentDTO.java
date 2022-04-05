@@ -12,4 +12,5 @@ public class AssignmentDTO {
     private String employeeFullName;
     @NotNull
     private String projectName;
+    private Integer numberOfHour;
 }

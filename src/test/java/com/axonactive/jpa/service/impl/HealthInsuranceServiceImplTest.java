@@ -38,7 +38,7 @@ class HealthInsuranceServiceImplTest {
     HealthInsuranceMapper healthInsuranceMapper;
 
     @Mock
-    EmployeeService employeeService;
+    EmployeeServiceImpl employeeService;
 
     @Mock
     EntityManager entityManager;
@@ -139,7 +139,7 @@ class HealthInsuranceServiceImplTest {
         healthInsuranceDTO.setExpirationDate(LocalDate.of(2021,11,9));
 
         int employeeId = 3;
-        when(employeeService.getEmployeeByIdFromDataBase(employeeId))
+        when(employeeService.findById(employeeId))
                 .thenReturn(employee);
 
         HealthInsurance healthInsuranceToBeAdd = new HealthInsurance();

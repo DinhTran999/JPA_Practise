@@ -27,7 +27,7 @@ public class DepartmentController {
     @GET
     @ApiOperation(value = "getAllDepartments", response =Department.class, responseContainer = "List")
     public Response getAllDepartments(@HeaderParam("Authorization") String authorization){
-        jwtAuthenticationServices.checkAuthorizedToken(authorization);
+//        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.findAll()).build();
     }
 
@@ -36,7 +36,7 @@ public class DepartmentController {
     @Path("/{id}")
     @ApiOperation("get department by Id")
     public Response getDepartmentById(@HeaderParam("Authorization") String authorization,@PathParam("id") int id){
-        jwtAuthenticationServices.checkAuthorizedToken(authorization);
+//        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.findById(id)).build();
     }
 

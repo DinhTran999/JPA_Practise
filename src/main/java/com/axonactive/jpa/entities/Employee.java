@@ -64,6 +64,20 @@ public class Employee implements IEntity {
     @JoinColumn(name = "department_id", referencedColumnName = "id", nullable = false)
     private Department department;
 
+    @Embedded
+    private ContactInfo contactInfo;
+
+    public Employee(Integer id, String firstName, String middleName, String lastName, LocalDate dateOfBirth, Gender gender, double salary, Department department) {
+        this.id = id;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.dateOfBirth = dateOfBirth;
+        this.gender = gender;
+        this.salary = salary;
+        this.department = department;
+    }
+
     public Integer getId(){
         return this.id;
     }

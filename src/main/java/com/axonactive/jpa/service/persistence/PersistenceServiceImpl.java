@@ -15,6 +15,10 @@ public class PersistenceServiceImpl<T extends IEntity> implements PersistenceSer
     @PersistenceContext(name = "jpa")
     protected EntityManager em;
 
+    public EntityManager getEntityManager() {
+        return em;
+    }
+
     private Class<T> persistenceClass;
 
     @Override
@@ -75,7 +79,6 @@ public class PersistenceServiceImpl<T extends IEntity> implements PersistenceSer
     @Override
     public List<T> findAll() {
         String className = getPersistentClass().getSimpleName();
-        System.out.println(em);
         return em.createQuery("from "+className,getPersistentClass()).getResultList();
     }
 

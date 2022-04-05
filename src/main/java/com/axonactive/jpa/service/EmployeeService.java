@@ -3,7 +3,7 @@ package com.axonactive.jpa.service;
 import com.axonactive.jpa.controller.request.EmployeeOfDepartmentRequest;
 import com.axonactive.jpa.controller.request.EmployeeRequest;
 import com.axonactive.jpa.entities.Employee;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 import com.axonactive.jpa.service.dto.EmployeeGroupByDepartmentDTO;
 
 import java.util.List;

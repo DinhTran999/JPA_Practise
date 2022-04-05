@@ -12,4 +12,5 @@ public class AssignmentRequest {
     private int employeeId;
     @NotNull
     private int projectId;
+    private Integer numberOfHour;
 }

@@ -2,7 +2,7 @@ package com.axonactive.jpa.service.mapper;
 
 import com.axonactive.jpa.controller.request.EmployeeOfDepartmentRequest;
 import com.axonactive.jpa.entities.Employee;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

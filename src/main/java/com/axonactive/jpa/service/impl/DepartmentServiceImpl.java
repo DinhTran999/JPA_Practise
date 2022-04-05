@@ -2,8 +2,11 @@ package com.axonactive.jpa.service.impl;
 
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
+import com.axonactive.jpa.entities.Project;
 import com.axonactive.jpa.exeption.NoSuchDepartmentException;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.dto.DepartmentWithProjectsDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
+import com.axonactive.jpa.service.mapper.ProjectMapper;
 import com.axonactive.jpa.service.persistence.AbstractCRUDBean;
 import com.axonactive.jpa.service.persistence.PersistenceService;
 
@@ -12,8 +15,10 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
@@ -25,6 +30,9 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
 
     @Inject
     EmployeeServiceImpl employeeService;
+
+    @Inject
+    ProjectMapper projectMapper;
 
     @Override
     protected PersistenceService<Department> getPersistenceService() {
@@ -62,4 +70,20 @@ public class DepartmentServiceImpl extends AbstractCRUDBean<Department> {
         return !employeeDTOList.isEmpty();
     }
 
+    /**
+     * List all departments together with projects
+     * */
+    public List<DepartmentWithProjectsDTO> getAllDepartmentWithProjects() {
+        List<Department> departmentList = findAll();
+        return departmentList.stream().map(d->{
+            DepartmentWithProjectsDTO departmentWithProjectsDTO = new DepartmentWithProjectsDTO();
+            departmentWithProjectsDTO.setId(d.getId());
+            departmentWithProjectsDTO.setName(d.getName());
+            departmentWithProjectsDTO.setStartDate(d.getStartDate());
+            List<Project> projectList = persistenceService.getEntityManager().createQuery("from Project p where p.department.id=:departmentId", Project.class)
+                    .setParameter("departmentId", d.getId()).getResultList();
+            departmentWithProjectsDTO.setProjectList(projectMapper.ProjectsToProjectDtos(projectList));
+            return departmentWithProjectsDTO;
+        }).sorted(Comparator.comparing(DepartmentWithProjectsDTO::getName)).collect(Collectors.toList());
+    }
 }

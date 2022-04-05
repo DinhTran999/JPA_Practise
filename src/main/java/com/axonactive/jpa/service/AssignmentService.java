@@ -1,12 +1,15 @@
 package com.axonactive.jpa.service;
 
 import com.axonactive.jpa.controller.request.AssignmentRequest;
+import com.axonactive.jpa.entities.Assignment;
 import com.axonactive.jpa.service.dto.AssignmentDTO;
 
 import java.util.List;
 
 public interface AssignmentService {
-    List<AssignmentDTO> getAssignments(AssignmentRequest assignmentRequest);
+
+    List<Assignment> getAssignmentsFromDatabase();
+    List<AssignmentDTO> getAssignments();
 
     AssignmentDTO getAssignmentById(int assignmentId);
 
