@@ -5,13 +5,11 @@ import com.axonactive.jpa.entities.Assignment;
 import com.axonactive.jpa.entities.Project;
 import com.axonactive.jpa.service.ProjectService;
 import com.axonactive.jpa.service.dto.project.ProjectDTO;
-import com.axonactive.jpa.service.dto.project.ProjectWithCostDTO;
+import com.axonactive.jpa.service.dto.project.ProjectWithHoursAndCostDTO;
 import com.axonactive.jpa.service.dto.project.ProjectWithDeptNameDTO;
 import com.axonactive.jpa.service.dto.project.ProjectWithNumOfHourAndNumOfEmplDTO;
 import com.axonactive.jpa.service.mapper.ProjectMapper;
 import com.axonactive.jpa.service.mapper.ProjectWithDeptNameMapper;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
 
 import javax.enterprise.context.RequestScoped;
@@ -23,9 +21,8 @@ import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+import java.io.FileReader;
+import java.lang.reflect.Field;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -130,6 +127,10 @@ public class ProjectServiceImpl implements ProjectService {
         return projectMapper.ProjectToProjectDto(project);
     }
 
+    /**
+     *
+     * @param projectId
+     */
     @Override
     public void deleteProjectById(int projectId) {
         Project project = getProjectByIdFromDatabase(projectId);
@@ -137,6 +138,13 @@ public class ProjectServiceImpl implements ProjectService {
             em.remove(project);
         }
     }
+
+    /**
+     *
+     * @param projectId
+     * @param projectRequest
+     * @return
+     */
 
     @Override
     public ProjectDTO updateProject(int projectId, ProjectRequest projectRequest) {
@@ -151,7 +159,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * List all project with managed department*
+     * Returns a List of all projects together with managed department name
+     * @return a List of all projects together with managed department name
      */
     @Override
     public List<ProjectWithDeptNameDTO> getProjectWithDeptName() {
@@ -161,7 +170,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * List all project with number of employees and number of hours*
+     * Return a List all projects with number of employees and number of hours in a specific area
+     * @param area the area of the project
+     * @return a list all projects with number of employees and number of hours in a specific area
+     * or empty list if do not have any project in this area.
      */
     @Override
     public List<ProjectWithNumOfHourAndNumOfEmplDTO> getAllProjectWithEffort(String area) {
@@ -207,10 +219,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     /**
-     * List all projects with total cost
+     * Returns a List all projects with total cost (salary) and hours in specific area
+     * @param area the area of the project
+     * @return a List all projects with total cost in specific area
+     * @throws java.io.IOException if the name of file does not exist
+     * or empty list if there has no project in this area.
      */
     @Override
-    public List<ProjectWithCostDTO> getAllProjectWithCost(String area) {
+    public List<ProjectWithHoursAndCostDTO> getAllProjectWithHoursAndCost(String area) {
+//        FileReader reader = new FileReader("d");
         return em.createQuery("from Assignment", Assignment.class).getResultList().stream()
                 .collect(Collectors.groupingBy(Assignment::getProject))
                 .entrySet()
@@ -219,12 +236,13 @@ public class ProjectServiceImpl implements ProjectService {
                 .map(projectEntry -> {
                     Project project = projectEntry.getKey();
                     List<Assignment> assignmentList = projectEntry.getValue();
-                    ProjectWithCostDTO projectWithCostDTO = new ProjectWithCostDTO();
+                    ProjectWithHoursAndCostDTO projectWithCostDTO = new ProjectWithHoursAndCostDTO();
                     projectWithCostDTO.setId(project.getId());
                     projectWithCostDTO.setName(project.getName());
                     projectWithCostDTO.setArea(project.getArea());
                     projectWithCostDTO.setDepartmentId(project.getDepartment().getId());
-                    Double cost = assignmentList.stream().mapToDouble(a -> a.getEmployee().getSalary() * 1000 / TOTAL_HOURS_PER_MONTH * a.getNumberOfHour()).sum();
+                    projectWithCostDTO.setHours(assignmentList.stream().mapToInt(Assignment::getNumberOfHour).sum());
+                    double cost = assignmentList.stream().mapToDouble(a -> a.getEmployee().getSalary() * 1000 / TOTAL_HOURS_PER_MONTH * a.getNumberOfHour()).sum();
                     projectWithCostDTO.setCost(String.format("%.2f", cost));
                     return projectWithCostDTO;
                 }).collect(Collectors.toList());

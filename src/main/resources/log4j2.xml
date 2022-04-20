@@ -1,35 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="DEBUG">
-    <Properties>
-        <Property name="basePath">C:/Sun/wildfly-26.0.0.Final/standalone/log</Property>
-    </Properties>
+
+
+<Configuration name="Coman">
     <Appenders>
         <Console name="LogToConsole" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+            <PatternLayout
+                    pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
-        <RollingFile name="LogToRollingFile" fileName="${basePath}/company_management.log"
-                     filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+        <RollingFile name="RollingFile" fileName="${env:JBOSS_HOME}/standalone/log/company-manage.log"
+                     filePattern="${env:JBOSS_HOME}/standalone/log/${date:yyyy-MM-dd}/company-manage.log.%d{MM-dd-yyyy}-%i">
             <PatternLayout>
-<!--                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>-->
-                <Pattern>%d %p %c [%t] %m%n</Pattern>
+                <Pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level [%c] (%M) - %m%n%throwable{full}</Pattern>
             </PatternLayout>
             <Policies>
-                <TimeBasedTriggeringPolicy />
-                <SizeBasedTriggeringPolicy size="10 MB"/>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100 KB"/>
             </Policies>
-            <DefaultRolloverStrategy max="10"/>
         </RollingFile>
-
     </Appenders>
     <Loggers>
-        <!-- avoid duplicated logs with additivity=false -->
-        <Logger name="com.axonactive" level="debug" additivity="false">
-            <AppenderRef ref="LogToRollingFile"/>
+        <Logger name="com.axonactive" level="debug" additivity="false">-->
+            <AppenderRef ref="RollingFile"/>
             <AppenderRef ref="LogToConsole"/><!-- them dong nay thi console moi in ra logger.info -->
         </Logger>
-
-        <Root level="info">
-            <AppenderRef ref="LogToConsole"/>
+        <Root level="debug">
+            <AppenderRef ref="RollingFile"/>
+            <!--            <AppenderRef ref="LogToConsole"/>-->
         </Root>
     </Loggers>
 </Configuration>

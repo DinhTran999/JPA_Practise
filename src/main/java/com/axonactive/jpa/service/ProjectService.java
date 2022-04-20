@@ -3,7 +3,7 @@ package com.axonactive.jpa.service;
 import com.axonactive.jpa.controller.request.ProjectRequest;
 import com.axonactive.jpa.entities.Project;
 import com.axonactive.jpa.service.dto.project.ProjectDTO;
-import com.axonactive.jpa.service.dto.project.ProjectWithCostDTO;
+import com.axonactive.jpa.service.dto.project.ProjectWithHoursAndCostDTO;
 import com.axonactive.jpa.service.dto.project.ProjectWithDeptNameDTO;
 import com.axonactive.jpa.service.dto.project.ProjectWithNumOfHourAndNumOfEmplDTO;
 
@@ -30,5 +30,5 @@ public interface ProjectService {
 
     List<ProjectWithNumOfHourAndNumOfEmplDTO> getAllProjectWithEffort(String area);
 
-    List<ProjectWithCostDTO> getAllProjectWithCost(String area);
+    List<ProjectWithHoursAndCostDTO> getAllProjectWithHoursAndCost(String area);
 }

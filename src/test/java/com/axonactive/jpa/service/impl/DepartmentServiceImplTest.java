@@ -2,7 +2,7 @@ package com.axonactive.jpa.service.impl;
 
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
-import com.axonactive.jpa.exeption.NoSuchDepartmentException;
+import com.axonactive.jpa.exeption.DepartmentException;
 import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 import com.axonactive.jpa.service.persistence.PersistenceService;
 import org.junit.jupiter.api.Test;
@@ -104,13 +104,13 @@ class DepartmentServiceImplTest {
 
         //department will be deleted
         Department departmentToBeDelete = new Department(departmentId,"A",LocalDate.of(2021,11,9));
-        when(entityManager.find(Department.class,departmentId)).thenReturn(departmentToBeDelete);
+        when(persistenceService.findById(departmentId)).thenReturn(departmentToBeDelete);
 
         //list employees of department will be deleted
         List<EmployeeDTO> employeeDTOList = new ArrayList<>();
         when(employeeService.getAllEmployeeByDepartment(departmentId)).thenReturn(employeeDTOList);
         departmentService.deleteDepartment(departmentId);
-        verify(entityManager,times(1)).remove(departmentToBeDelete);
+        verify(persistenceService).removeEntity(departmentToBeDelete);
 
     }
 
@@ -143,7 +143,7 @@ class DepartmentServiceImplTest {
         //department will be deleted
         Department departmentToBeDelete = null;
         when(persistenceService.findById(departmentId)).thenReturn(departmentToBeDelete);
-        assertThrows(NoSuchDepartmentException.class,()-> departmentService.deleteDepartment(departmentId));
+        assertThrows(DepartmentException.class,()-> departmentService.deleteDepartment(departmentId));
     }
 
     @Test
@@ -158,7 +158,7 @@ class DepartmentServiceImplTest {
         Department departmentBeforeUpdate = new Department(departmentId,"other name",LocalDate.of(2021,11,9));
 
         //mock database
-        when(entityManager.find(Department.class,departmentId)).thenReturn(departmentBeforeUpdate);
+        when(persistenceService.findById(departmentId)).thenReturn(departmentBeforeUpdate);
 
         //result
         Department expectedUpdatedDepartment = new Department();
@@ -166,9 +166,10 @@ class DepartmentServiceImplTest {
         expectedUpdatedDepartment.setStartDate(departmentRequest.getStartDate());
         expectedUpdatedDepartment.setId(departmentId);
 
+        when(persistenceService.update(expectedUpdatedDepartment)).thenReturn(expectedUpdatedDepartment);
         Department actualUpdateDepartment = departmentService.updateDepartment(departmentId, departmentRequest);
 
-        verify(entityManager,times(1)).merge(expectedUpdatedDepartment);
+        verify(persistenceService).update(expectedUpdatedDepartment);
         assertEquals(actualUpdateDepartment,expectedUpdatedDepartment);
 
 

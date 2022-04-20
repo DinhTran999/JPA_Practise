@@ -7,7 +7,9 @@ import com.axonactive.jpa.enumerate.Gender;
 import com.axonactive.jpa.service.DepartmentService;
 import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 import com.axonactive.jpa.service.mapper.EmployeeMapper;
+import com.axonactive.jpa.service.persistence.PersistenceService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -35,6 +37,9 @@ class EmployeeServiceImplTest {
     EmployeeServiceImpl employeeService;
 
     @Mock
+    PersistenceService persistenceService;
+
+    @Mock
     EntityManager entityManager;
 
     @Mock
@@ -44,7 +49,7 @@ class EmployeeServiceImplTest {
     TypedQuery<Employee> typedQuery;
 
     @Mock
-    DepartmentService departmentService;
+    DepartmentServiceImpl departmentService;
 
     Employee employee1;
     Employee employee2;
@@ -66,16 +71,16 @@ class EmployeeServiceImplTest {
     void getEmployeeByIdFromDataBase_FindRightId_ShouldReturnEmployee() {
         int employeeIdToBeFind = 3;
         Employee expectedEmployee = getEmployeeFromTestListById(employeeIdToBeFind);
-        when(entityManager.find(Employee.class, employeeIdToBeFind))
+        when(persistenceService.findById(employeeIdToBeFind))
                 .thenReturn(expectedEmployee);
         Employee actualEmployee = employeeService.findById(employeeIdToBeFind);
         assertEquals(expectedEmployee, actualEmployee);
     }
 
     @Test
-    void getEmployeeByIdFromDataBase_FindWorngId_ShouldReturnNull() {
+    void getEmployeeByIdFromDataBase_FindWrongId_ShouldReturnNull() {
         int employeeIdToBeFind = 11;
-        when(entityManager.find(Employee.class, employeeIdToBeFind))
+        when(persistenceService.findById(employeeIdToBeFind))
                 .thenReturn(null);
         Employee actualEmployee = employeeService.findById(employeeIdToBeFind);
         assertNull(actualEmployee);
@@ -90,7 +95,7 @@ class EmployeeServiceImplTest {
         EmployeeDTO expectedEmployeeDTO = employeeToEmployeeDTO(expectedEmployee);
 
         //mock
-        when(employeeService.findById(employeeIdToBeFind)).thenReturn(expectedEmployee);
+        when(persistenceService.findById(employeeIdToBeFind)).thenReturn(expectedEmployee);
         when(employeeMapper.EmployeeToEmployeeDto(expectedEmployee)).thenReturn(expectedEmployeeDTO);
 
         //actual
@@ -100,12 +105,10 @@ class EmployeeServiceImplTest {
 
     @Test
     void getAllEmployees_ShouldReTurnEmployeeDTOList() {
-        when(entityManager.createNamedQuery(Employee.GET_ALL, Employee.class)).thenReturn(typedQuery);
-        when(typedQuery.getResultList()).thenReturn(employeeList);
         List<EmployeeDTO> expectedEmployeeDTOList = new ArrayList<>();
         expectedEmployeeDTOList.add(employeeToEmployeeDTO(employee1));
         expectedEmployeeDTOList.add(employeeToEmployeeDTO(employee2));
-
+        when(persistenceService.findAll()).thenReturn(employeeList);
         when(employeeMapper.EmployeesToEmployeeDtos(employeeList)).thenReturn(expectedEmployeeDTOList);
         List<EmployeeDTO> actualEmployeeDTOList = employeeService.getAllEmployees();
         assertEquals(expectedEmployeeDTOList, actualEmployeeDTOList);
@@ -135,31 +138,33 @@ class EmployeeServiceImplTest {
         department.setId(employeeRequest.getDepartmentId());
 
         when(employeeMapper.EmployeeRequestToEmployee(employeeRequest)).thenReturn(employeeWithOutDepartment);
-        when(departmentService.getDepartmentById(employeeRequest.getDepartmentId())).thenReturn(department);
+        when(departmentService.findById(employeeRequest.getDepartmentId())).thenReturn(department);
 
         Employee expectedEmployee = employeeWithOutDepartment;
-        expectedEmployee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+        expectedEmployee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
         EmployeeDTO expectedEmployeeDTO = employeeToEmployeeDTO(expectedEmployee);
 
+        when(persistenceService.save(expectedEmployee)).thenReturn(expectedEmployee);
         when(employeeMapper.EmployeeToEmployeeDto(expectedEmployee)).thenReturn(expectedEmployeeDTO);
         EmployeeDTO actualEmployeeDTO = employeeService.addEmployee(employeeRequest);
 
         assertEquals(expectedEmployeeDTO, actualEmployeeDTO);
-        verify(entityManager).persist(expectedEmployee);
+        verify(persistenceService).save(expectedEmployee);
 
     }
 
     @Test
     void deleteEmployeeById_RightEmployeeId_ShouldDeleteEmployee() {
         Employee employeeToBeDelete = employeeList.get(0);
-        when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(employeeToBeDelete);
+//        when(persistenceService.findById(anyInt())).thenReturn(employeeToBeDelete);
         employeeService.remove(employeeToBeDelete.getId());
-        verify(entityManager).remove(employeeToBeDelete);
+        verify(persistenceService).remove(employeeToBeDelete.getId());
     }
 
     @Test
+    @Disabled("need to test this case in persistenceServiceImpl")
     void deleteEmployeeById_WrongEmployeeId_ShouldNotDeleteEmployee() {
-        when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(null);
+        when(persistenceService.findById(anyInt())).thenReturn(null);
         employeeService.remove(0);
         verify(entityManager, never()).remove(any(Employee.class));
     }
@@ -180,8 +185,8 @@ class EmployeeServiceImplTest {
         Department department = new Department();
         department.setId(10);
 
-        when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(employeeBeforeUpdate);
-        when(departmentService.getDepartmentById(employeeRequest.getDepartmentId())).thenReturn(department);
+        when(persistenceService.findById(anyInt())).thenReturn(employeeBeforeUpdate);
+        when(departmentService.findById(employeeRequest.getDepartmentId())).thenReturn(department);
         Employee updatedEmployee = employeeBeforeUpdate;
         updatedEmployee.setFirstName(employeeRequest.getFirstName());
         updatedEmployee.setMiddleName(employeeRequest.getMiddleName());
@@ -189,31 +194,31 @@ class EmployeeServiceImplTest {
         updatedEmployee.setGender(employeeRequest.getGender());
         updatedEmployee.setSalary(employeeRequest.getSalary());
         updatedEmployee.setDateOfBirth(employeeRequest.getDateOfBirth());
-        updatedEmployee.setDepartment(departmentService.getDepartmentById(employeeRequest.getDepartmentId()));
+        updatedEmployee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
 
         EmployeeDTO expectedUpdatedEmployeeDTO = employeeToEmployeeDTO(updatedEmployee);
-        when(entityManager.merge(updatedEmployee)).thenReturn(updatedEmployee);
+        when(persistenceService.update(updatedEmployee)).thenReturn(updatedEmployee);
         when(employeeMapper.EmployeeToEmployeeDto(updatedEmployee)).thenReturn(expectedUpdatedEmployeeDTO);
 
         EmployeeDTO actualUpdatedEmployeeDTO = employeeService.updateEmployeeById(employeeBeforeUpdate.getId(), employeeRequest);
         assertEquals(expectedUpdatedEmployeeDTO, actualUpdatedEmployeeDTO);
-        verify(entityManager).merge(updatedEmployee);
+        verify(persistenceService).update(updatedEmployee);
 
     }
 
     @Test
     void updateEmployeeById_WrongEmployeeId_ShouldThrowWebApplicationException() {
         int employeeId = 0;
-        when(entityManager.find(eq(Employee.class), anyInt())).thenReturn(null);
+        when(persistenceService.findById(anyInt())).thenReturn(null);
 
         try {
-            employeeService.updateEmployeeById(eq(employeeId),any(EmployeeRequest.class));
+            employeeService.updateEmployeeById(employeeId,any(EmployeeRequest.class));
             fail("expect to throw WebApplicationException");
         } catch (WebApplicationException e){
             Response response = e.getResponse();
             assertEquals(Response.Status.BAD_REQUEST, response.getStatusInfo());
             assertEquals("Không có Employee với Id: "+employeeId,response.getEntity().toString());
-            verify(entityManager,never()).merge(any(Employee.class));
+            verify(persistenceService,never()).update(any(Employee.class));
         }
 
     }
@@ -236,11 +241,4 @@ class EmployeeServiceImplTest {
                 .get();
     }
 
-    @Test
-    void test(){
-        List<String> list = employeeList.stream().map(x->x.getLastName()).collect(Collectors.toList());
-        list.forEach(System.out::println);
-
-
-    }
 }

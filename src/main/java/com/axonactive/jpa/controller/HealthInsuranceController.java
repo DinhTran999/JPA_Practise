@@ -2,6 +2,7 @@ package com.axonactive.jpa.controller;
 
 
 import com.axonactive.jpa.service.HealthInsuranceService;
+import com.axonactive.jpa.service.JWTAuthenticationServices;
 import com.axonactive.jpa.service.dto.HealthInsuranceDTO;
 
 import javax.inject.Inject;
@@ -17,27 +18,34 @@ public class HealthInsuranceController {
     @Inject
     HealthInsuranceService healthInsuranceService;
 
+    @Inject
+    JWTAuthenticationServices jwtAuthenticationServices;
+
 
     @GET
-    public Response getHealthInsuranceByEmployeeId(@PathParam("employeeId") int employeeId){
+    public Response getHealthInsuranceByEmployeeId(@HeaderParam("Authorization") String authorization,@PathParam("employeeId") int employeeId){
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(healthInsuranceService.getHealthInsuranceByEmployeeId(employeeId)).build();
     }
 
 
     @GET
     @Path("/{healthInsuranceId}")
-    public Response getHealthInsuranceByEmployeeIdAndHealthInsuranceId(@PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
+    public Response getHealthInsuranceByEmployeeIdAndHealthInsuranceId(@HeaderParam("Authorization") String authorization, @PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(healthInsuranceService.getHealthInsuranceByEmployeeIdAndHealthInsuranceId(employeeId,healthInsuranceId)).build();
     }
 
     @POST
-    public Response addHealthInsurance(@PathParam("employeeId") int employeeId, HealthInsuranceDTO healthInsuranceDTO){
+    public Response addHealthInsurance(@HeaderParam("Authorization") String authorization, @PathParam("employeeId") int employeeId, HealthInsuranceDTO healthInsuranceDTO){
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(healthInsuranceService.addHealthInsurance(employeeId, healthInsuranceDTO)).build();
     }
 
     @DELETE
     @Path("/{healthInsuranceId}")
-    public Response deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(@PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
+    public Response deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(@HeaderParam("Authorization") String authorization, @PathParam("employeeId") int employeeId, @PathParam("healthInsuranceId") int healthInsuranceId){
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         healthInsuranceService.deleteHealthInsuranceByEmployeeIdAndHealthInsuranceId(employeeId, healthInsuranceId);
         return Response.ok().build();
     }
@@ -45,7 +53,8 @@ public class HealthInsuranceController {
 
     @PUT
     @Path("/{healthInsuranceId}")
-    public Response updateHealthInsurance(@PathParam("employeeId") int employeeId,@PathParam("healthInsuranceId") int healthInsuranceId, HealthInsuranceDTO healthInsuranceDTO){
+    public Response updateHealthInsurance(@HeaderParam("Authorization") String authorization, @PathParam("employeeId") int employeeId,@PathParam("healthInsuranceId") int healthInsuranceId, HealthInsuranceDTO healthInsuranceDTO){
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(healthInsuranceService.updateHealthInsurance(employeeId,healthInsuranceId, healthInsuranceDTO)).build();
     }
 

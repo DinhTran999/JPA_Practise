@@ -32,8 +32,6 @@ public class EmployeeServiceImpl extends AbstractCRUDBean<Employee> {
     @Inject
     PersistenceService<Employee> persistenceService;
 
-    public static final int YEARS_TO_SUBTRACT = 21;
-
     @Inject
     EmployeeMapper employeeMapper;
 
@@ -56,10 +54,19 @@ public class EmployeeServiceImpl extends AbstractCRUDBean<Employee> {
     }
 
     public EmployeeDTO getEmployeeById(int employeeId) {
+        log.info("get employee id {}",employeeId);
         return employeeMapper.EmployeeToEmployeeDto(findById(employeeId));
     }
 
     public EmployeeDTO addEmployee(EmployeeRequest employeeRequest) {
+        log.debug("add employee has departmentId: {}, firstName: {}, middleName: {}, lastName: {}, dateOfBirth: {}, gender: {}, salary: {}",
+                employeeRequest.getDepartmentId(),
+                employeeRequest.getFirstName(),
+                employeeRequest.getMiddleName(),
+                employeeRequest.getLastName(),
+                employeeRequest.getDateOfBirth(),
+                employeeRequest.getGender(),
+                employeeRequest.getSalary());
         Employee employee = employeeMapper.EmployeeRequestToEmployee(employeeRequest);
         employee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
         return employeeMapper.EmployeeToEmployeeDto(save(employee));
@@ -68,6 +75,16 @@ public class EmployeeServiceImpl extends AbstractCRUDBean<Employee> {
     public EmployeeDTO updateEmployeeById(int employeeId, EmployeeRequest employeeRequest) {
         Employee employee = findById(employeeId);
         if (Objects.nonNull(employee)) {
+            log.debug("update employeeId: {}, with info departmentId: {}, firstName: {}, middleName: {}, lastName: {}, dateOfBirth: {}, gender: {}, salary: {}",
+                    employeeId,
+                    employeeRequest.getDepartmentId(),
+                    employeeRequest.getFirstName(),
+                    employeeRequest.getMiddleName(),
+                    employeeRequest.getLastName(),
+                    employeeRequest.getDateOfBirth(),
+                    employeeRequest.getGender(),
+                    employeeRequest.getSalary());
+
             employee.setFirstName(employeeRequest.getFirstName());
             employee.setMiddleName(employeeRequest.getMiddleName());
             employee.setLastName(employeeRequest.getLastName());
@@ -77,20 +94,22 @@ public class EmployeeServiceImpl extends AbstractCRUDBean<Employee> {
             employee.setDepartment(departmentService.findById(employeeRequest.getDepartmentId()));
             return employeeMapper.EmployeeToEmployeeDto(update(employee));
         }
+        log.error("update employeeId: {} is not in data base",employeeId);
         throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Không có Employee với Id: " + employeeId).build());
     }
 
 
     public List<EmployeeDTO> getAllEmployeeByDepartment(int departmentId) {
+        log.info("get all employees has departmentId: {}",departmentId);
         return employeeMapper.EmployeesToEmployeeDtos(createTypeQuery("from Employee e where e.departmentId =:departmentId")
                 .setParameter("departmentId", departmentId)
                 .getResultList());
     }
 
     /**
-     * get employees has not being assigned in any project
+     * returns list of employees have not being assigned in any project
+     * @return a list of employees have not being assigned in any project ar empty list if all employees have been assigned
      */
-
     public List<EmployeeDTO> getAllEmployeesNotAssigned() {
         List<Integer> employeeInProject = assignmentService.getAssignmentsFromDatabase()
                 .stream()
@@ -104,7 +123,8 @@ public class EmployeeServiceImpl extends AbstractCRUDBean<Employee> {
     }
 
     /**
-     * List of employee work in project which has been managed by another department
+     * Returns a List of employee work in project which has been managed by another department
+     * @return a List of employee work in project which has been managed by another department or empty list if all employees just work for their department
      * */
     public List<EmployeeProjectDTO> getEmployeesWorkInOtherDepartment() {
         return assignmentService.getAssignmentsFromDatabase()

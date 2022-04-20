@@ -4,7 +4,6 @@ import com.axonactive.jpa.entities.Department;
 import com.axonactive.jpa.entities.Employee;
 import com.axonactive.jpa.entities.HealthInsurance;
 import com.axonactive.jpa.enumerate.Gender;
-import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.dto.HealthInsuranceDTO;
 import com.axonactive.jpa.service.mapper.HealthInsuranceMapper;
 import org.junit.jupiter.api.BeforeEach;

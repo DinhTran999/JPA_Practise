@@ -10,6 +10,8 @@ import com.axonactive.jpa.entities.User;
 import com.axonactive.jpa.exeption.UnAuthorizedException;
 import com.axonactive.jpa.helper.AppConfigService;
 import com.axonactive.jpa.service.impl.UserServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -23,15 +25,18 @@ import java.util.UUID;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 
+//@Log4j2
 public class JWTAuthenticationServices {
 
     @Inject
     UserServiceImpl userService;
 
+    private static final Logger logger = LogManager.getLogger(JWTAuthenticationServices.class);
+
     public Token createToken(UserRequest userRequest) {
         validateUser(userRequest);
 
-        String token = null;
+        String token;
         String secretKey = AppConfigService.getSecretKey();
         String issuer = AppConfigService.getIssuer();
         int timeToLive = AppConfigService.getTimeToLive();
@@ -45,8 +50,8 @@ public class JWTAuthenticationServices {
                     .withExpiresAt(this.setTokenTimeToLive(timeToLive))
                     .sign(algorithm);
         } catch (IllegalArgumentException e) {
-            //log
-            System.out.println(e.getMessage());
+            logger.error("could not create token as the argument is illegal");
+            throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Could not create Token").build());
         }
 
         if (Objects.isNull(token)) {
@@ -57,7 +62,8 @@ public class JWTAuthenticationServices {
 
     public void checkAuthorizedToken(String authorization) {
         if (Objects.isNull(authorization)) {
-            throw new WebApplicationException(Response.status(FORBIDDEN).entity("User not in system").build());
+            logger.error("The authorization header is null");
+            throw new WebApplicationException(Response.status(FORBIDDEN).entity("There is no authorization header in the request").build());
         }
         String jwtToken = getSWTToken(authorization);
         try {
@@ -67,11 +73,10 @@ public class JWTAuthenticationServices {
             verifier.verify(jwtToken);
 
         } catch (JWTVerificationException e) {
-            throw new UnAuthorizedException();
+            logger.error("the token is invalided");
+            throw new WebApplicationException(Response.status(FORBIDDEN).entity("The token for authentication is invalided").build());
         } catch (IllegalArgumentException e) {
-            //log
-            System.out.println(e.getMessage());
-
+            logger.error("the secret key {} is invalided", e.getMessage());
         }
 
     }
@@ -79,7 +84,7 @@ public class JWTAuthenticationServices {
     private void validateUser(UserRequest userRequest) {
         User userInDataBase = userService.findUserByNameAndPassword(userRequest.getName(), userRequest.getPassword());
         if (Objects.isNull(userInDataBase)) {
-//            throw new WebApplicationException(Response.status(FORBIDDEN).entity("User not in system").build());
+            logger.error("try to get authorization with username: {}",userRequest.getName());
             throw new UnAuthorizedException();
         }
     }
@@ -93,7 +98,8 @@ public class JWTAuthenticationServices {
     private String getSWTToken(String authorization) {
         String[] authPaths = authorization.split("\\s+");
         if (authPaths.length < 2 || !authPaths[0].equals("Bearer")) {
-            throw new UnAuthorizedException();
+            logger.error("There is no swtToken in header");
+            throw new WebApplicationException(Response.status(FORBIDDEN).entity("Lack of SWT Token in authentication header").build());
         }
         return authPaths[1];
     }

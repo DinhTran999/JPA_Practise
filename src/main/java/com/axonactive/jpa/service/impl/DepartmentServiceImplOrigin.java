@@ -2,10 +2,9 @@ package com.axonactive.jpa.service.impl;
 
 import com.axonactive.jpa.controller.request.DepartmentRequest;
 import com.axonactive.jpa.entities.Department;
-import com.axonactive.jpa.exeption.NoSuchDepartmentException;
+import com.axonactive.jpa.exeption.DepartmentException;
 import com.axonactive.jpa.service.DepartmentService;
-import com.axonactive.jpa.service.EmployeeService;
-import com.axonactive.jpa.service.dto.EmployeeDTO;
+import com.axonactive.jpa.service.dto.employee.EmployeeDTO;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -27,7 +26,7 @@ public class DepartmentServiceImplOrigin implements DepartmentService {
     private EntityManager em;
 
     @Inject
-    private EmployeeService employeeService;
+    private EmployeeServiceImpl employeeService;
 
     @Override
     public Department getDepartmentById(int id) {
@@ -52,7 +51,7 @@ public class DepartmentServiceImplOrigin implements DepartmentService {
     public void deleteDepartment(int id) {
         Department department = getDepartmentById(id);
         if(Objects.isNull(department)){
-            throw new NoSuchDepartmentException();
+            throw new DepartmentException(BAD_REQUEST,"Không tồn tại Department này");
         }
         if(isDepartmentHasEmployees(id)){
             throw new WebApplicationException(Response.status(BAD_REQUEST).entity("Department có employee không thể xóa").build());

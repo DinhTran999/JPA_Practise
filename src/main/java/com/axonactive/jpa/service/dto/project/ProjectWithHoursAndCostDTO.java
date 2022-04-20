@@ -7,6 +7,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ProjectWithCostDTO extends ProjectDTO{
+public class ProjectWithHoursAndCostDTO extends ProjectDTO{
     private String cost;
+    private Integer hours;
 }

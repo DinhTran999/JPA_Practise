@@ -1,7 +1,5 @@
 package com.axonactive.jpa.controller;
 
-import com.axonactive.jpa.service.DepartmentService;
-import com.axonactive.jpa.service.EmployeeService;
 import com.axonactive.jpa.service.ProjectService;
 import com.axonactive.jpa.service.impl.DepartmentServiceImpl;
 import com.axonactive.jpa.service.impl.EmployeeServiceImpl;
@@ -76,9 +74,9 @@ public class CompanyController {
     }
 
     @GET
-    @Path("project-with-cost/{area}")
+    @Path("project-with-hours-cost/{area}")
     public Response getProjectsWithCost(@PathParam("area") String area){
-        return Response.ok(projectService.getAllProjectWithCost(area)).build();
+        return Response.ok(projectService.getAllProjectWithHoursAndCost(area)).build();
     }
 
     @GET

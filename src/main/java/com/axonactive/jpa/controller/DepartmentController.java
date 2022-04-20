@@ -6,6 +6,7 @@ import com.axonactive.jpa.service.JWTAuthenticationServices;
 import com.axonactive.jpa.service.impl.DepartmentServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.log4j.Log4j2;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
@@ -16,6 +17,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 @Api(value = "Departments")
+@Log4j2
 public class DepartmentController {
 
     @Inject
@@ -27,7 +29,7 @@ public class DepartmentController {
     @GET
     @ApiOperation(value = "getAllDepartments", response =Department.class, responseContainer = "List")
     public Response getAllDepartments(@HeaderParam("Authorization") String authorization){
-//        jwtAuthenticationServices.checkAuthorizedToken(authorization);
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
         return Response.ok(departmentService.findAll()).build();
     }
 
@@ -36,7 +38,8 @@ public class DepartmentController {
     @Path("/{id}")
     @ApiOperation("get department by Id")
     public Response getDepartmentById(@HeaderParam("Authorization") String authorization,@PathParam("id") int id){
-//        jwtAuthenticationServices.checkAuthorizedToken(authorization);
+        jwtAuthenticationServices.checkAuthorizedToken(authorization);
+        log.info("get department with id: {}",id);
         return Response.ok(departmentService.findById(id)).build();
     }
 

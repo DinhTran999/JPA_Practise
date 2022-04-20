@@ -94,6 +94,11 @@ public class RelativeServiceImpl implements RelativeService {
                 .getSingleResult();
     }
 
+    /**
+     * Returns a list of Employee together with their relatives
+     * No param
+     * Returns: a list of Employee together with their relatives
+     * */
     public List<EmployeeRelativeDTO> getRelativeOfEmployee() {
         return getAllrelatives().stream()
                 .collect(Collectors.groupingBy(Relative::getEmployee))
@@ -121,6 +126,14 @@ public class RelativeServiceImpl implements RelativeService {
         return relativeList.stream().filter(r ->
                 r.getRelationship().equals(relationship)).findAny();
     }
+    /**
+     * Returns a list of employees together with their emergency contact
+     * No param
+     * Returns: a list of employees together with their emergency contact
+     * if employee has father contact the emergency contact will be father
+     * else if employee has mother contact the emergency contact will be mother
+     * otherwise the emergency contact could be any relative of that employee
+     * */
     public List<EmployeeRelativeDTO> getEmployeeEmergencyRelative(){
         return getAllrelatives().stream()
                 .collect(Collectors.groupingBy(Relative::getEmployee))
